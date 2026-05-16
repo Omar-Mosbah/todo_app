@@ -1,95 +1,118 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:todo_app/screens/home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+  WelcomeScreen({super.key});
 
-  @override
+  final TextEditingController nameController = TextEditingController();
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
+
+  @override 
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-          child: Center(
-            // color: Colors.red,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/images/unnamed.png",
-                    width: 42,
-                    height: 42,),
-                    SizedBox(width: 16,),
-                    Text(
-                      'Tasky',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w400,
-                    ),
-                    ),  
-                  ],
-                ),
-                SizedBox(height:108,),
-                Text("Welcome to Tasky ",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w400,
-                ),),
-                SizedBox(height:8,),
-                Text("Your productivity journey starts here.",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                ),),
-                SizedBox(height:24,),
-                SvgPicture.asset("assets/images/pana.svg",
-                width: 215,
-                height: 205,),
-                SizedBox(height:24,),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: Center(
+          // color: Colors.red,
+          child: SingleChildScrollView(
+            child: Form(
+              key: _key,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Full Name",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                      ),),
-                      TextField(
+                      Image.asset(
+                        "assets/images/unnamed.png",
+                        width: 42,
+                        height: 42,
+                      ),
+                      SizedBox(width: 16),
+                      Text(
+                        'Tasky',
                         style: TextStyle(
-                          color: Colors.white
-                        ),
-                        decoration: InputDecoration(
-                          hintText: "eg. Omar Mosbah",
-                          hintStyle: TextStyle(
-                            color: Color(0xFF6D6D6D)
-                          ),
-                          filled: true,
-                          fillColor: Color(0xFF282828),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none
-                          )
+                          fontSize: 28,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                      SizedBox(height:24,),
-                      ElevatedButton(
-                        onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF15B86C),
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text("Get Started")),
                     ],
                   ),
-                )
-              ],
+                  SizedBox(height: 108),
+                  Text(
+                    "Welcome to Tasky ",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Your productivity journey starts here.",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                  ),
+                  SizedBox(height: 24),
+                  SvgPicture.asset(
+                    "assets/images/pana.svg",
+                    width: 215,
+                    height: 205,
+                  ),
+                  SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Full Name",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        TextFormField(
+                          controller: nameController,
+                          style: TextStyle(color: Colors.white),
+                          // InputDecoration is used to style the TextField
+                          decoration: InputDecoration(
+                            hintText: "eg. Omar Mosbah",
+                            hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
+                            filled: true,
+                            fillColor: Color(0xFF282828),
+                            // OutlineInputBoarder is used to set boarder radius for TextField
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (nameController.text.trim().isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomeScreen(),
+                              ),
+                            );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF15B86C),
+                            foregroundColor: Colors.white,
+                            fixedSize: Size(360, 40),
+                          ),
+                          child: Text("Get Started"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          ),
-        
-      );
+        ),
+      ),
+    );
   }
 }
