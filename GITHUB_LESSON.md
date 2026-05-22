@@ -55,6 +55,53 @@ Help beginners understand the exact Git commands and reasoning used to update a 
 
 ---
 
+## How to pull current files safely (recommended)
+
+Use this flow when you want the latest files from `origin/main` without losing local uncommitted work.
+
+1. Check your current branch and local changes:
+```bash
+git status --short --branch
+```
+
+2. Pull with rebase + autostash:
+```bash
+git pull --rebase --autostash origin main
+```
+- Why this is safer:
+- `--rebase` keeps history cleaner than creating a merge commit on every pull.
+- `--autostash` temporarily stashes uncommitted changes, pulls/rebases, then reapplies them.
+- This avoids the common "please commit or stash first" error.
+
+3. Confirm final state:
+```bash
+git status --short --branch
+```
+
+If conflicts happen during rebase:
+```bash
+git status
+# resolve files manually
+git add <resolved-files>
+git rebase --continue
+```
+
+If you want to cancel the rebase:
+```bash
+git rebase --abort
+```
+
+If `autostash` cannot reapply cleanly:
+```bash
+git stash list
+git stash show -p stash@{0}
+git stash pop stash@{0}
+```
+
+Tip: If your goal is to discard local changes and exactly match remote files, use a destructive sync (`git reset --hard origin/main`) only when you are sure nothing local needs to be kept.
+
+---
+
 ## Machine-generated files that commonly differ between machines
 
 These files are produced by Flutter tooling or platform builds and frequently differ across developer machines and SDK versions. If your team prefers not to track them, add them to `.gitignore`.
