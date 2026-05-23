@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/screens/home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -8,7 +9,7 @@ class WelcomeScreen extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -71,6 +72,18 @@ class WelcomeScreen extends StatelessWidget {
                         SizedBox(height: 12),
                         TextFormField(
                           controller: nameController,
+                          // validate for empty ,
+                          //length less than 3 and more than 50 characters ,
+                          // not contain numbers or special characters
+                          validator: (value) => value!.trim().isEmpty
+                              ? "Name is required"
+                              : value.trim().length < 3
+                              ? "Name must be at least 3 characters"
+                              : value.trim().length > 50
+                              ? "Name must be less than 50 characters"
+                              : RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())
+                              ? null
+                              : "Name must not contain numbers or special characters",
                           style: TextStyle(color: Colors.white),
                           // InputDecoration is used to style the TextField
                           decoration: InputDecoration(
@@ -87,14 +100,20 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 24),
                         ElevatedButton(
-                          onPressed: () {
-                            if (nameController.text.trim().isNotEmpty) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomeScreen(),
-                              ),
-                            );
+                          onPressed: () async {
+                            if (_key.currentState!.validate()) {
+                              final pref =
+                                  await SharedPreferences.getInstance();
+                              pref.setString(
+                                'username',
+                                nameController.text.toString(),
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomeScreen(),
+                                ),
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(
