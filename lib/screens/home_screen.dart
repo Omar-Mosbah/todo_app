@@ -60,6 +60,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+              ElevatedButton(
+                onPressed: (){}, 
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF15B86C),
+                  foregroundColor: Colors.white,
+                  fixedSize: Size(167, 40),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add),
+                    SizedBox(width: 6),
+                    Text(
+                      'Add New Task'),
+                  ],
+                ),
+                ),
             ],
           ),
         ),
