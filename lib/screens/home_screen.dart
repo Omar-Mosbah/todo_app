@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_app/screens/add_task.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +27,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: SizedBox(
+        height: 40,
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddTask()),
+            );
+          },
+          backgroundColor: Color(0xFF15B86C),
+          icon: Icon(Icons.add),
+          label: Text('Add New Task'),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -60,24 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              ElevatedButton(
-                onPressed: (){}, 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF15B86C),
-                  foregroundColor: Colors.white,
-                  fixedSize: Size(167, 40),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add),
-                    SizedBox(width: 6),
-                    Text(
-                      'Add New Task'),
-                  ],
-                ),
-                ),
             ],
           ),
         ),

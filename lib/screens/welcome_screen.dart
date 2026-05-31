@@ -108,7 +108,7 @@ class WelcomeScreen extends StatelessWidget {
                                 'username',
                                 nameController.text.toString(),
                               );
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => HomeScreen(),
