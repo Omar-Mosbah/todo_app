@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/screens/welcome_screen.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
@@ -7,6 +8,11 @@ class AddTask extends StatefulWidget {
   State<AddTask> createState() => _AddTaskState();
 }
 
+final TextEditingController taskNameController = TextEditingController();
+final TextEditingController taskDescController = TextEditingController();
+final GlobalKey<FormState> _key = GlobalKey<FormState>();
+bool isHighPriority = true;
+
 class _AddTaskState extends State<AddTask> {
   @override
   Widget build(BuildContext context) {
@@ -14,32 +20,98 @@ class _AddTaskState extends State<AddTask> {
       appBar: AppBar(
         title: Text('New Task'),
         centerTitle: false,
-        titleTextStyle: TextStyle(
-          fontSize: 20
-        ),
+        titleTextStyle: TextStyle(fontSize: 20),
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextFormField(
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Prepare the breakfast for tommorow',
-                  hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
-                  filled: true,
-                  fillColor: Color(0xFF282828),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none
+          child: Form(
+            key: _key,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Task Name',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                ),
+                SizedBox(height: 8),
+                TextFormField(
+                  controller: taskNameController,
+                  validator: (value) => value!.trim().isEmpty ? "Waot" : null,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Prepare the breakfast for tommorow',
+                    hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
+                    filled: true,
+                    fillColor: Color(0xFF282828),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              )
-            ],
+                SizedBox(height: 20),
+                Text(
+                  'Task Description',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                ),
+                SizedBox(height: 8),
+                TextFormField(
+                  controller: taskDescController,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return "Please write description";
+                    }
+                  },
+                  style: TextStyle(color: Colors.white),
+                  maxLines: 6,
+                  decoration: InputDecoration(
+                    hintText: 'Descripe your task ...',
+                    hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
+                    filled: true,
+                    fillColor: Color(0xFF282828),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+                Row(
+                  children: [
+                    Text('High Priority',style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),),
+                    Spacer(),
+                    Switch(
+                    value: isHighPriority, 
+                    onChanged: (bool value)=>setState(() {
+                      isHighPriority = value;
+                        }
+                      ),
+                    activeThumbColor:Colors.white,
+                    activeTrackColor: Color(0xFF15B86C),),
+                  ],
+                ),
+                Spacer(),
+                OutlinedButton.icon(
+                  onPressed: () async => _key.currentState!.validate() ? 
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => WelcomeScreen())
+                    ,
+                    ): null,
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Color(0xFF15B86C),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 12)
+                  ),
+                  icon: Icon(Icons.add),
+                  label: Text('Add Task'),
+                  
+                ),
+              ],
+            ),
           ),
         ),
-        ),
+      ),
     );
   }
 }
