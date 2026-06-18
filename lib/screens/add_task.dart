@@ -28,86 +28,103 @@ class _AddTaskState extends State<AddTask> {
           child: Form(
             key: _key,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Task Name',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-                ),
-                SizedBox(height: 8),
-                TextFormField(
-                  controller: taskNameController,
-                  validator: (value) => value!.trim().isEmpty ? "Waot" : null,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Prepare the breakfast for tommorow',
-                    hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
-                    filled: true,
-                    fillColor: Color(0xFF282828),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Task Name',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                        ),
+                        SizedBox(height: 8),
+                        TextFormField(
+                          controller: taskNameController,
+                          validator: (value) => value!.trim().isEmpty ? "Waot" : null,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Prepare the breakfast for tommorow',
+                            hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
+                            filled: true,
+                            fillColor: Color(0xFF282828),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Task Description',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                        ),
+                        SizedBox(height: 8),
+                        TextFormField(
+                          controller: taskDescController,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return "Please write description";
+                            }
+                          },
+                          style: TextStyle(color: Colors.white),
+                          maxLines: 6,
+                          decoration: InputDecoration(
+                            hintText: 'Descripe your task ...',
+                            hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
+                            filled: true,
+                            fillColor: Color(0xFF282828),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Text(
+                              'High Priority',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Spacer(),
+                            Switch(
+                              value: isHighPriority,
+                              onChanged: (bool value) {
+                                setState(() {  
+                                isHighPriority = value;
+                                });
+                              },
+                              activeThumbColor: Colors.white,
+                              activeTrackColor: Color(0xFF15B86C),
+                            ),
+                          ],
+                        ),
+                        // Spacer(),
+                        
+                      ],
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
-                Text(
-                  'Task Description',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-                ),
-                SizedBox(height: 8),
-                TextFormField(
-                  controller: taskDescController,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Please write description";
-                    }
-                  },
-                  style: TextStyle(color: Colors.white),
-                  maxLines: 6,
-                  decoration: InputDecoration(
-                    hintText: 'Descripe your task ...',
-                    hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
-                    filled: true,
-                    fillColor: Color(0xFF282828),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 24),
-                Row(
-                  children: [
-                    Text('High Priority',style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),),
-                    Spacer(),
-                    Switch(
-                    value: isHighPriority, 
-                    onChanged: (bool value)=>setState(() {
-                      isHighPriority = value;
-                        }
-                      ),
-                    activeThumbColor:Colors.white,
-                    activeTrackColor: Color(0xFF15B86C),),
-                  ],
-                ),
-                Spacer(),
                 OutlinedButton.icon(
-                  onPressed: () async => _key.currentState!.validate() ? 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => WelcomeScreen())
-                    ,
-                    ): null,
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Color(0xFF15B86C),
-                    fixedSize: Size(MediaQuery.of(context).size.width, 12)
-                  ),
-                  icon: Icon(Icons.add),
-                  label: Text('Add Task'),
-                  
-                ),
-              ],
+                      onPressed: () async => _key.currentState!.validate()
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WelcomeScreen(),
+                              ),
+                            )
+                          : null,
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Color(0xFF15B86C),
+                        fixedSize: Size(MediaQuery.of(context).size.width, 12),
+                      ),
+                      icon: Icon(Icons.add),
+                      label: Text('Add Task'),
+                    ),],
             ),
           ),
         ),
