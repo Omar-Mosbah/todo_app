@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_app/screens/home_screen.dart';
 import 'package:todo_app/screens/welcome_screen.dart';
 
 class AddTask extends StatefulWidget {
@@ -36,12 +40,16 @@ class _AddTaskState extends State<AddTask> {
                       children: [
                         Text(
                           'Task Name',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                         SizedBox(height: 8),
                         TextFormField(
                           controller: taskNameController,
-                          validator: (value) => value!.trim().isEmpty ? "Waot" : null,
+                          validator: (value) =>
+                              value!.trim().isEmpty ? "Waot" : null,
                           style: TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'Prepare the breakfast for tommorow',
@@ -57,7 +65,10 @@ class _AddTaskState extends State<AddTask> {
                         SizedBox(height: 20),
                         Text(
                           'Task Description',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                         SizedBox(height: 8),
                         TextFormField(
@@ -94,8 +105,8 @@ class _AddTaskState extends State<AddTask> {
                             Switch(
                               value: isHighPriority,
                               onChanged: (bool value) {
-                                setState(() {  
-                                isHighPriority = value;
+                                setState(() {
+                                  isHighPriority = value;
                                 });
                               },
                               activeThumbColor: Colors.white,
@@ -103,28 +114,48 @@ class _AddTaskState extends State<AddTask> {
                             ),
                           ],
                         ),
+
                         // Spacer(),
-                        
                       ],
                     ),
                   ),
                 ),
                 OutlinedButton.icon(
-                      onPressed: () async => _key.currentState!.validate()
-                          ? Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => WelcomeScreen(),
-                              ),
-                            )
-                          : null,
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Color(0xFF15B86C),
-                        fixedSize: Size(MediaQuery.of(context).size.width, 12),
-                      ),
-                      icon: Icon(Icons.add),
-                      label: Text('Add Task'),
-                    ),],
+                  onPressed: () async {
+                    if (_key.currentState?.validate() ?? false) {
+                      final task = <String, dynamic>{
+                        "taskName": taskNameController.text,
+                        "taskDescription": taskDescController.text,
+                        "isHighPrioirty": isHighPriority,
+                      };
+                      final pref = await SharedPreferences.getInstance();
+                      String? savedTask = pref.getString("tasks");
+                      List<dynamic> tasksList = [];
+                      if (savedTask != null) {
+                        tasksList = jsonDecode(savedTask);
+                        print('find:$tasksList');
+                      }
+                      tasksList.add(task);
+                      print('after adding:$tasksList');
+                      final encodedTasksList = jsonEncode(tasksList);
+                      await pref.setString("tasks", encodedTasksList);
+                      taskNameController.clear();
+                      taskDescController.clear();
+                      isHighPriority = true;
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                      );
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Color(0xFF15B86C),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 12),
+                  ),
+                  icon: Icon(Icons.add),
+                  label: Text('Add Task'),
+                ),
+              ],
             ),
           ),
         ),

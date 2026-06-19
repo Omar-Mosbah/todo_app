@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/screens/add_task.dart';
@@ -11,16 +13,30 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? name;
+  List<dynamic> tasksDecoded = [];
   @override
   void initState() {
     super.initState();
     _loadUsername();
+    _loadTasks();
   }
 
   void _loadUsername() async {
     final pref = await SharedPreferences.getInstance();
     setState(() {
       name = pref.getString('username');
+    });
+  }
+
+  void _loadTasks() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      final task = pref.getString('tasks');
+      print('tasks from pref:$task');
+      tasksDecoded = jsonDecode(task ?? "[]");
+      // write a print statment to view the type of the tasksDecoded variable
+      print('Type of tasksDecoded: ${jsonDecode(task ?? "[]").runtimeType}');
+      print('tasks decoded:$tasksDecoded');
     });
   }
 
