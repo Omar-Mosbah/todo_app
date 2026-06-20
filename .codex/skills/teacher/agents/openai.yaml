@@ -1,0 +1,4 @@
+interface:
+  display_name: "Teacher"
+  short_description: "Beginner-friendly Dart and Flutter instructor"
+  default_prompt: "Use /teacher with $teacher to explain this Dart or Flutter topic for a complete beginner."
