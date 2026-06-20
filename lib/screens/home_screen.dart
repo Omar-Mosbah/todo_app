@@ -31,14 +31,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadTasks() async {
     final pref = await SharedPreferences.getInstance();
+    // Load tasks from SharedPreferences the format is a String
+    final task = pref.getString('tasks');
+    print('tasks from pref:$task');
+    if (task != null) {
+      final List<dynamic> tasksDecoded = jsonDecode(task);
+      taskMapped = tasksDecoded
+          .map((element) => Task.fromJson(element))
+          .toList();
+    }
+    ;
     setState(() {
-      final task = pref.getString('tasks');
-      print('tasks from pref:$task');
-      final List<dynamic> tasksDecoded =  jsonDecode(task ?? "[]") ;
-      taskMapped = tasksDecoded.map((taskelement) {
-        return Task.fromJson(taskelement);
-      }).toList();
-      // write a print statment to view the type of the tasksDecoded variable
+      taskMapped;
       print('tasks decoded:$taskMapped');
     });
   }
@@ -95,8 +99,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               SizedBox(height: 16),
-              if(taskMapped.isNotEmpty)
-              Text(taskMapped[0].taskName),
+              if (taskMapped.isNotEmpty)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: taskMapped.length,
+                    itemBuilder: (context, index) {
+                      return SingleChildScrollView(
+                        child: Container(
+                          padding: EdgeInsets.all(16),
+                          alignment: Alignment.center,
+                          height: 54,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.blueGrey,
+                          ),
+                          child: Text(
+                            '${taskMapped[index].taskName}',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
             ],
           ),
         ),

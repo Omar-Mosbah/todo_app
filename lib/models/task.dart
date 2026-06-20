@@ -14,9 +14,9 @@ class Task {
   };
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
-      taskName: json["taskName"],
-      taskDescription: json["taskDescription"],
-      isHighPriority: json["isHighPriority"]
-      );
+      taskName: json["taskName"] ,
+      taskDescription: json["taskDescription"] ,
+      isHighPriority: json["isHighPriority"],
+    );
   }
 }
