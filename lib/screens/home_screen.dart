@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/screens/add_task.dart';
+import 'package:todo_app/models/task.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? name;
-  List<dynamic> tasksDecoded = [];
+  List<Task> taskMapped = [];
   @override
   void initState() {
     super.initState();
@@ -33,10 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       final task = pref.getString('tasks');
       print('tasks from pref:$task');
-      tasksDecoded = jsonDecode(task ?? "[]");
+      final List<dynamic> tasksDecoded =  jsonDecode(task ?? "[]") ;
+      taskMapped = tasksDecoded.map((taskelement) {
+        return Task.fromJson(taskelement);
+      }).toList();
       // write a print statment to view the type of the tasksDecoded variable
-      print('Type of tasksDecoded: ${jsonDecode(task ?? "[]").runtimeType}');
-      print('tasks decoded:$tasksDecoded');
+      print('tasks decoded:$taskMapped');
     });
   }
 
@@ -91,6 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+              SizedBox(height: 16),
+              if(taskMapped.isNotEmpty)
+              Text(taskMapped[0].taskName),
             ],
           ),
         ),

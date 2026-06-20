@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_app/models/task.dart';
 import 'package:todo_app/screens/home_screen.dart';
 import 'package:todo_app/screens/welcome_screen.dart';
 
@@ -123,19 +124,20 @@ class _AddTaskState extends State<AddTask> {
                 OutlinedButton.icon(
                   onPressed: () async {
                     if (_key.currentState?.validate() ?? false) {
-                      final task = <String, dynamic>{
-                        "taskName": taskNameController.text,
-                        "taskDescription": taskDescController.text,
-                        "isHighPrioirty": isHighPriority,
-                      };
+                      final task = Task(
+                        taskName: taskNameController.text,
+                        taskDescription: taskDescController.text,
+                        isHighPriority: isHighPriority,
+                      );
                       final pref = await SharedPreferences.getInstance();
                       String? savedTask = pref.getString("tasks");
                       List<dynamic> tasksList = [];
                       if (savedTask != null) {
                         tasksList = jsonDecode(savedTask);
+                        print(tasksList.runtimeType);
                         print('find:$tasksList');
                       }
-                      tasksList.add(task);
+                      tasksList.add(task.toJson());
                       print('after adding:$tasksList');
                       final encodedTasksList = jsonEncode(tasksList);
                       await pref.setString("tasks", encodedTasksList);
