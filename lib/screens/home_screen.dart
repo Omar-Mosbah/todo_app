@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String? name;
   List<Task> taskMapped = [];
+  // bool isDone = false;
   @override
   void initState() {
     super.initState();
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ;
     setState(() {
       taskMapped;
-      print('tasks decoded:$taskMapped');
+      print('tasks decoded:${taskMapped[0].isDone}');
     });
   }
 
@@ -105,18 +106,52 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: taskMapped.length,
                     itemBuilder: (context, index) {
                       return SingleChildScrollView(
-                        child: Container(
-                          padding: EdgeInsets.all(16),
-                          alignment: Alignment.center,
-                          height: 54,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.blueGrey,
-                          ),
-                          child: Text(
-                            '${taskMapped[index].taskName}',
-                            textAlign: TextAlign.center,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            padding: EdgeInsets.only(top: 14),
+                            alignment: Alignment.topCenter,
+                            height: 72,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Color(0xFF282828),
+                            ),
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                  activeColor: Color(0xFF15B86C),
+                                  checkColor: Color(0xFFFFFCFC),
+                                  value: taskMapped[index].isDone,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      taskMapped[index].isDone = value ?? false;
+                                    });
+                                  },
+                                ),
+                                Column(
+                                  children: [
+                                    Text(
+                                      '${taskMapped[index].taskName}',
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                        decoration: taskMapped[index].isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                                        fontSize: 16,
+                                        color: taskMapped[index].isDone ? Color(0xFFC6C6C6) : Color(0xFFFFFCFC),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${taskMapped[index].taskDescription}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color(0xFFC6C6C6),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );

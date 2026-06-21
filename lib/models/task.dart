@@ -2,21 +2,25 @@ class Task {
   final String taskName;
   final String taskDescription;
   final bool isHighPriority;
-  const Task({
+  bool isDone;
+  Task({
     required this.taskName,
     required this.taskDescription,
     required this.isHighPriority,
+    this.isDone = false,
   });
   Map<String, dynamic> toJson() => {
     'taskName': taskName,
     'taskDescription': taskDescription,
     'isHighPriority': isHighPriority,
+    'isDone' : isDone,
   };
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
-      taskName: json["taskName"] ,
-      taskDescription: json["taskDescription"] ,
+      taskName: json["taskName"],
+      taskDescription: json["taskDescription"],
       isHighPriority: json["isHighPriority"],
+      isDone: json["isDone"] ?? false
     );
   }
 }
