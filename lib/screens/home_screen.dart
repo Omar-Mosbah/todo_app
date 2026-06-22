@@ -120,14 +120,29 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Row(
                               children: [
                                 Checkbox(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
                                   activeColor: Color(0xFF15B86C),
                                   checkColor: Color(0xFFFFFCFC),
                                   value: taskMapped[index].isDone,
-                                  onChanged: (bool? value) {
+                                  onChanged: (bool? value) async {
                                     setState(() {
                                       taskMapped[index].isDone = value ?? false;
                                     });
+                                    final pref =
+                                        await SharedPreferences.getInstance();
+                                    // the taskmapped is now list of Task instance []
+                                    print('$taskMapped');
+                                    final List<dynamic>taskUpdate = taskMapped
+                                        .map((taskInst) => taskInst.toJson())
+                                        .toList();
+                                    // the taskUpdate is now list of json files []
+                                    print('$taskUpdate');
+                                    pref.setString(
+                                      "tasks",
+                                      jsonEncode(taskMapped),
+                                    );
                                   },
                                 ),
                                 Column(
@@ -136,9 +151,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       '${taskMapped[index].taskName}',
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
-                                        decoration: taskMapped[index].isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                                        decoration: taskMapped[index].isDone
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
                                         fontSize: 16,
-                                        color: taskMapped[index].isDone ? Color(0xFFC6C6C6) : Color(0xFFFFFCFC),
+                                        color: taskMapped[index].isDone
+                                            ? Color(0xFFC6C6C6)
+                                            : Color(0xFFFFFCFC),
                                       ),
                                     ),
                                     Text(
