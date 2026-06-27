@@ -50,10 +50,10 @@ class _AddTaskState extends State<AddTask> {
                         TextFormField(
                           controller: taskNameController,
                           validator: (value) =>
-                              value!.trim().isEmpty ? "Waot" : null,
+                              value!.trim().isEmpty ? "Task name is required" : null,
                           style: TextStyle(color: Colors.white),
                           decoration: InputDecoration(
-                            hintText: 'Prepare the breakfast for tommorow',
+                            hintText: 'Prepare the breakfast for tomorrow',
                             hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
                             filled: true,
                             fillColor: Color(0xFF282828),
@@ -76,13 +76,13 @@ class _AddTaskState extends State<AddTask> {
                           controller: taskDescController,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return "Please write description";
+                              return "Task description is required";
                             }
                           },
                           style: TextStyle(color: Colors.white),
                           maxLines: 6,
                           decoration: InputDecoration(
-                            hintText: 'Descripe your task ...',
+                            hintText: 'Describe your task ...',
                             hintStyle: TextStyle(color: Color(0xFF6D6D6D)),
                             filled: true,
                             fillColor: Color(0xFF282828),

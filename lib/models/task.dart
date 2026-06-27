@@ -2,7 +2,7 @@ class Task {
   final String taskName;
   final String taskDescription;
   final bool isHighPriority;
-  bool isDone;
+  bool isDone = false;
   Task({
     required this.taskName,
     required this.taskDescription,

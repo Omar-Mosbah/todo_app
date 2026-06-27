@@ -37,14 +37,14 @@ class _HomeScreenState extends State<HomeScreen> {
     print('tasks from pref:$task');
     if (task != null) {
       final List<dynamic> tasksDecoded = jsonDecode(task);
+      print('tasks decoded:$tasksDecoded');
       taskMapped = tasksDecoded
           .map((element) => Task.fromJson(element))
           .toList();
-    }
-    ;
+    };
     setState(() {
       taskMapped;
-      print('tasks decoded:${taskMapped[0].isDone}');
+      
     });
   }
 
@@ -69,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -99,25 +100,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              
               if (taskMapped.isNotEmpty)
+              SizedBox(height: 24,),
+              Text("My Tasks",
+              style: TextStyle(
+                fontSize: 20,
+                color: Color(0xFFFFFCFC)
+              ),),
+              SizedBox(height: 16),
                 Expanded(
                   child: ListView.builder(
                     itemCount: taskMapped.length,
+                    padding: EdgeInsets.only(bottom: 24),
                     itemBuilder: (context, index) {
                       return SingleChildScrollView(
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.only(top:8.0),
                           child: Container(
-                            padding: EdgeInsets.only(top: 14),
-                            alignment: Alignment.topCenter,
-                            height: 72,
+                            // padding: EdgeInsets.only(top: 8),
+                            alignment: Alignment.center,
+                            height: 56,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               color: Color(0xFF282828),
                             ),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Checkbox(
                                   shape: RoundedRectangleBorder(
@@ -134,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         await SharedPreferences.getInstance();
                                     // the taskmapped is now list of Task instance []
                                     print('$taskMapped');
-                                    final List<dynamic>taskUpdate = taskMapped
+                                    final List<dynamic> taskUpdate = taskMapped
                                         .map((taskInst) => taskInst.toJson())
                                         .toList();
                                     // the taskUpdate is now list of json files []
@@ -145,30 +156,41 @@ class _HomeScreenState extends State<HomeScreen> {
                                     );
                                   },
                                 ),
-                                Column(
-                                  children: [
-                                    Text(
-                                      '${taskMapped[index].taskName}',
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        decoration: taskMapped[index].isDone
-                                            ? TextDecoration.lineThrough
-                                            : TextDecoration.none,
-                                        fontSize: 16,
-                                        color: taskMapped[index].isDone
-                                            ? Color(0xFFC6C6C6)
-                                            : Color(0xFFFFFCFC),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${taskMapped[index].taskName}',
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                          decoration: taskMapped[index].isDone
+                                              ? TextDecoration.lineThrough
+                                              : TextDecoration.none,
+                                          fontSize: 16,
+                                          color: taskMapped[index].isDone
+                                              ? Color(0xFFC6C6C6)
+                                              : Color(0xFFFFFCFC),
+                                        ),
+                                      maxLines: 1,),
+                                      Text(
+                                        '${taskMapped[index].taskDescription}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFFC6C6C6),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        textAlign: TextAlign.start,
+                                        
+                                        maxLines: 1
                                       ),
-                                    ),
-                                    Text(
-                                      '${taskMapped[index].taskDescription}',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xFFC6C6C6),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
+                                IconButton(
+                                      onPressed: (){},
+                                      icon: Icon(Icons.more_vert),
+                                      color: taskMapped[index].isDone ? Color(0xFFC6C6C6) : Color(0xFFFFFCFC),),
                               ],
                             ),
                           ),
