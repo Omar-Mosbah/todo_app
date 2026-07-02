@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_app/screens/home_screen.dart';
+import 'package:todo_app/screens/main_screen.dart';
 import 'package:todo_app/screens/welcome_screen.dart';
 
 void main() async {
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
       title: 'Tasky',
-      home: name == null ? WelcomeScreen() : HomeScreen(),
+      home: name == null ? WelcomeScreen() : MainScreen(),
     );
   }
 }

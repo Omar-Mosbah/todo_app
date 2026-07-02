@@ -16,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? name;
   List<Task> taskMapped = [];
   // bool isDone = false;
+  // bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -31,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadTasks() async {
+    // await Future.delayed(Duration(seconds: 10));
     final pref = await SharedPreferences.getInstance();
     // Load tasks from SharedPreferences the format is a String
     final task = pref.getString('tasks');
@@ -44,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     };
     setState(() {
       taskMapped;
-      
+      // isLoading = false;
     });
   }
 
@@ -101,18 +103,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               
-              if (taskMapped.isNotEmpty)
               SizedBox(height: 24,),
               Text("My Tasks",
               style: TextStyle(
                 fontSize: 20,
                 color: Color(0xFFFFFCFC)
               ),),
+              if (taskMapped.isNotEmpty)
               SizedBox(height: 16),
+              // isLoading ? Expanded(
+              //   child: Center(child: CircularProgressIndicator()),
+              // ) :
                 Expanded(
-                  child: ListView.builder(
+                  child: ListView.separated(
                     itemCount: taskMapped.length,
                     padding: EdgeInsets.only(bottom: 24),
+                    separatorBuilder: (context, index) {
+                      return SizedBox(height: 8);
+                    },
                     itemBuilder: (context, index) {
                       return SingleChildScrollView(
                         child: Padding(
