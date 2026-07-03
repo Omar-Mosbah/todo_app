@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/screens/add_task.dart';
 import 'package:todo_app/models/task.dart';
+import 'package:todo_app/widgets/tasks_list_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -63,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
           backgroundColor: Color(0xFF15B86C),
+          foregroundColor: Color(0xFFFFFCFC),
           icon: Icon(Icons.add),
           label: Text('Add New Task'),
         ),
@@ -115,97 +117,23 @@ class _HomeScreenState extends State<HomeScreen> {
               //   child: Center(child: CircularProgressIndicator()),
               // ) :
                 Expanded(
-                  child: ListView.separated(
-                    itemCount: taskMapped.length,
-                    padding: EdgeInsets.only(bottom: 24),
-                    separatorBuilder: (context, index) {
-                      return SizedBox(height: 8);
-                    },
-                    itemBuilder: (context, index) {
-                      return SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top:8.0),
-                          child: Container(
-                            // padding: EdgeInsets.only(top: 8),
-                            alignment: Alignment.center,
-                            height: 56,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Color(0xFF282828),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Checkbox(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  activeColor: Color(0xFF15B86C),
-                                  checkColor: Color(0xFFFFFCFC),
-                                  value: taskMapped[index].isDone,
-                                  onChanged: (bool? value) async {
-                                    setState(() {
-                                      taskMapped[index].isDone = value ?? false;
-                                    });
-                                    final pref =
-                                        await SharedPreferences.getInstance();
-                                    // the taskmapped is now list of Task instance []
-                                    print('$taskMapped');
-                                    final List<dynamic> taskUpdate = taskMapped
-                                        .map((taskInst) => taskInst.toJson())
-                                        .toList();
-                                    // the taskUpdate is now list of json files []
-                                    print('$taskUpdate');
-                                    pref.setString(
-                                      "tasks",
-                                      jsonEncode(taskMapped),
-                                    );
-                                  },
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${taskMapped[index].taskName}',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                          decoration: taskMapped[index].isDone
-                                              ? TextDecoration.lineThrough
-                                              : TextDecoration.none,
-                                          fontSize: 16,
-                                          color: taskMapped[index].isDone
-                                              ? Color(0xFFC6C6C6)
-                                              : Color(0xFFFFFCFC),
-                                        ),
-                                      maxLines: 1,),
-                                      Text(
-                                        '${taskMapped[index].taskDescription}',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Color(0xFFC6C6C6),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        textAlign: TextAlign.start,
-                                        
-                                        maxLines: 1
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                      onPressed: (){},
-                                      icon: Icon(Icons.more_vert),
-                                      color: taskMapped[index].isDone ? Color(0xFFC6C6C6) : Color(0xFFFFFCFC),),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  child: TasksListWidget(
+                    task: taskMapped, 
+                    onTaskChanged: (bool? value,index )async{
+                      setState(() {
+                        taskMapped[index!].isDone = value ?? false;
+                      });
+                      final pref = await SharedPreferences.getInstance();
+                      // the task is now list of Task instance []
+                      print('$taskMapped');
+                      final List<dynamic> taskUpdate = taskMapped
+                          .map((taskInst) => taskInst.toJson())
+                          .toList();
+                      // the taskUpdate is now list of json files []
+                      print('$taskUpdate');
+                      pref.setString("tasks", jsonEncode(taskMapped));
+                    }
+                    ),
                 ),
             ],
           ),

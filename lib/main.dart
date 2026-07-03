@@ -16,7 +16,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark(),
+      theme: ThemeData(
+        //colorScheme: ColorScheme.dark(),
+        useMaterial3: true,
+        scaffoldBackgroundColor: Color(0xFF181818),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor:Color(0xFF181818)),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF181818),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+          iconTheme: IconThemeData(color: Colors.white),)
+        ),
       debugShowCheckedModeBanner: false,
       title: 'Tasky',
       home: name == null ? WelcomeScreen() : MainScreen(),

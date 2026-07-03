@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/models/task.dart';
 import 'package:todo_app/screens/home_screen.dart';
+import 'package:todo_app/screens/main_screen.dart';
 
 
 class AddTask extends StatefulWidget {
@@ -24,8 +25,8 @@ class _AddTaskState extends State<AddTask> {
     return Scaffold(
       appBar: AppBar(
         title: Text('New Task'),
-        centerTitle: false,
-        titleTextStyle: TextStyle(fontSize: 20),
+        // centerTitle: false,
+        // titleTextStyle: TextStyle(fontSize: 20),
       ),
       body: SafeArea(
         child: Padding(
@@ -44,6 +45,7 @@ class _AddTaskState extends State<AddTask> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
+                            color: Color(0xFFFFFCFC),
                           ),
                         ),
                         SizedBox(height: 8),
@@ -69,6 +71,7 @@ class _AddTaskState extends State<AddTask> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
+                            color:Color(0xFFFFFCFC),
                           ),
                         ),
                         SizedBox(height: 8),
@@ -100,6 +103,7 @@ class _AddTaskState extends State<AddTask> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
+                                color:Color(0xFFFFFCFC),
                               ),
                             ),
                             Spacer(),
@@ -146,11 +150,12 @@ class _AddTaskState extends State<AddTask> {
                       isHighPriority = true;
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        MaterialPageRoute(builder: (context) => MainScreen()),
                       );
                     }
                   },
                   style: OutlinedButton.styleFrom(
+                    foregroundColor: Color(0xFFFFFCFC),
                     backgroundColor: Color(0xFF15B86C),
                     fixedSize: Size(MediaQuery.of(context).size.width, 12),
                   ),
