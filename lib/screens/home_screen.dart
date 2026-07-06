@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _loadTasks() async {
     // await Future.delayed(Duration(seconds: 10));
     final pref = await SharedPreferences.getInstance();
+    
     // Load tasks from SharedPreferences the format is a String
     final task = pref.getString('tasks');
     print('tasks from pref:$task');
@@ -44,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
       taskMapped = tasksDecoded
           .map((element) => Task.fromJson(element))
           .toList();
-    };
+    }
+    ;
     setState(() {
       taskMapped;
       // isLoading = false;
@@ -104,37 +106,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              
-              SizedBox(height: 24,),
-              Text("My Tasks",
-              style: TextStyle(
-                fontSize: 20,
-                color: Color(0xFFFFFCFC)
-              ),),
-              if (taskMapped.isNotEmpty)
-              SizedBox(height: 16),
+
+              SizedBox(height: 24),
+              Text(
+                "My Tasks",
+                style: TextStyle(fontSize: 20, color: Color(0xFFFFFCFC)),
+              ),
+              if (taskMapped.isNotEmpty) SizedBox(height: 16),
               // isLoading ? Expanded(
               //   child: Center(child: CircularProgressIndicator()),
               // ) :
-                Expanded(
-                  child: TasksListWidget(
-                    task: taskMapped, 
-                    onTaskChanged: (bool? value,index )async{
-                      setState(() {
-                        taskMapped[index!].isDone = value ?? false;
-                      });
-                      final pref = await SharedPreferences.getInstance();
-                      // the task is now list of Task instance []
-                      print('$taskMapped');
-                      final List<dynamic> taskUpdate = taskMapped
-                          .map((taskInst) => taskInst.toJson())
-                          .toList();
-                      // the taskUpdate is now list of json files []
-                      print('$taskUpdate');
-                      pref.setString("tasks", jsonEncode(taskMapped));
-                    }
-                    ),
+              Expanded(
+                child: TasksListWidget(
+                  task: taskMapped,
+                  onTaskChanged: (bool? value, index) async {
+                    setState(() {
+                      taskMapped[index!].isDone = value ?? false;
+                    });
+                    // get instance at the need i will set string will the new list
+                    // all values is modified together.
+                    final pref = await SharedPreferences.getInstance();
+                    // the task is now list of Task instance []
+                    print('$taskMapped');
+                    final List<dynamic> taskUpdate = taskMapped
+                        .map((taskInst) => taskInst.toJson())
+                        .toList();
+                    // the taskUpdate is now list of json files []
+                    print('$taskUpdate');
+                    pref.setString("tasks", jsonEncode(taskMapped));
+                  },
                 ),
+              ),
             ],
           ),
         ),
