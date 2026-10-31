@@ -3,7 +3,7 @@ import 'package:todo_app/models/task.dart';
 
 class TasksListWidget extends StatelessWidget {
   TasksListWidget({super.key, required this.task, required this.onTaskChanged});
-  List<Task> task;
+  final List<Task> task;
   final Function(bool?,int?) onTaskChanged;
   @override
   Widget build(BuildContext context) {
