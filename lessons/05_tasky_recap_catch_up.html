@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الدرس 05: مراجعة مشروع Tasky — Lesson 05: Tasky Recap</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root {
+    --bg: #fafaf7; --card: #ffffff; --text: #1f1e1c; --muted: #6b6a65; --line: #d6d4cb;
+    --accent: #0f8a52; --accent-bg: #e3f5ec; --warn: #b4540a; --warn-bg: #fdf0e3; --code-bg: #f3f2ee;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #181818; --card: #232322; --text: #ecebe6; --muted: #a3a29b; --line: #3c3b37;
+      --accent: #4fd197; --accent-bg: #173b2a; --warn: #f2a65a; --warn-bg: #3d2a17; --code-bg: #1e1e1d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #181818; --card: #232322; --text: #ecebe6; --muted: #a3a29b; --line: #3c3b37;
+    --accent: #4fd197; --accent-bg: #173b2a; --warn: #f2a65a; --warn-bg: #3d2a17; --code-bg: #1e1e1d;
+  }
+  * { box-sizing: border-box; }
+  html { direction: rtl; }
+  body {
+    direction: rtl; text-align: right; margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif; line-height: 1.8; font-size: 15px;
+  }
+  bdi, .ltr, code, pre { unicode-bidi: isolate; }
+  bdi[dir="ltr"] { white-space: nowrap; }
+  .ltr, code, pre { direction: ltr; text-align: left; }
+  table { direction: rtl; border-collapse: collapse; width: 100%; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { font-size: 24px; margin: 0 0 4px; }
+  header p { color: var(--muted); margin: 0; }
+  nav { margin: 18px 0; padding: 10px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  nav ol { margin: 0; padding-inline-start: 1.4rem; columns: 2; }
+  nav a { color: var(--accent); }
+  section { margin: 28px 0; break-inside: avoid-page; }
+  h2 { font-size: 19px; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--line); break-after: avoid; }
+  h3 { font-size: 16px; margin: 14px 0 6px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ar, .en { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+  .en { direction: ltr; text-align: left; font-family: system-ui, "Segoe UI", Arial, sans-serif; line-height: 1.6; }
+  .lang { display: inline-block; font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; margin-bottom: 4px; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+    overflow-x: auto; font-size: 13px; line-height: 1.5; break-inside: avoid; margin: 10px 0;
+  }
+  code { font-family: Consolas, "Cascadia Code", monospace; font-size: 0.92em; }
+  p code, li code, td code { background: var(--code-bg); padding: 0 4px; border-radius: 4px; }
+  th, td { border: 1px solid var(--line); padding: 6px 10px; vertical-align: top; }
+  th { background: var(--code-bg); }
+  .tbl-wrap { overflow-x: auto; }
+  .en table { direction: ltr; }
+  .flow { font-family: Consolas, monospace; font-size: 13px; }
+  .bug { background: var(--warn-bg); border-inline-start: 4px solid var(--warn); border-radius: 8px; padding: 10px 14px; margin: 10px 0; break-inside: avoid; }
+  .bug b { color: var(--warn); }
+  .here { background: var(--accent-bg); border-inline-start: 4px solid var(--accent); border-radius: 8px; padding: 10px 14px; }
+  .action { background: var(--accent-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 14px 18px; }
+  .shared { margin-top: 10px; }
+  a { color: var(--accent); }
+  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } nav ol { columns: 1; } }
+  @media print { nav { display: none; } .wrap { max-width: none; padding: 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>الدرس <bdi dir="ltr">05</bdi>: مراجعة شاملة لمشروع <bdi dir="ltr">Tasky</bdi> — نعود من حيث توقفت</h1>
+  <p lang="en" dir="ltr">Lesson 05: Full recap of the Tasky project — picking up where you left off</p>
+</header>
+
+<nav aria-label="محتويات الدرس">
+  <ol>
+    <li><a href="#where">أين توقفت؟ <span lang="en" dir="ltr">/ Where you stopped</span></a></li>
+    <li><a href="#map">خريطة المشروع <span lang="en" dir="ltr">/ Project map</span></a></li>
+    <li><a href="#start">تشغيل التطبيق <span lang="en" dir="ltr">/ App startup</span></a></li>
+    <li><a href="#model">نموذج المهمة و <bdi dir="ltr">JSON</bdi> <span lang="en" dir="ltr">/ Task model</span></a></li>
+    <li><a href="#storage">دورة الحفظ <span lang="en" dir="ltr">/ Storage cycle</span></a></li>
+    <li><a href="#state">الحالة وإعادة الرسم <span lang="en" dir="ltr">/ State</span></a></li>
+    <li><a href="#forms">النماذج والتحقق <span lang="en" dir="ltr">/ Forms</span></a></li>
+    <li><a href="#nav">التنقل <span lang="en" dir="ltr">/ Navigation</span></a></li>
+    <li><a href="#list">القائمة المشتركة <span lang="en" dir="ltr">/ Shared list widget</span></a></li>
+    <li><a href="#bugs">مشكلات في الكود الحالي <span lang="en" dir="ltr">/ Bugs found</span></a></li>
+    <li><a href="#next">ما التالي؟ <span lang="en" dir="ltr">/ What's next</span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- 1 -->
+<section id="where">
+  <h2><bdi dir="ltr">1.</bdi> أين توقفت؟ <span lang="en" dir="ltr">· Where you stopped</span></h2>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <p>أنت في <b>المشروع الثاني</b> من الدورة: تطبيق المهام <bdi dir="ltr">Tasky</bdi>. حسب خريطة الدورة، أنت داخل القسم <bdi dir="ltr">S7</bdi>، وهو القسم الذي يجمع <bdi dir="ltr">JSON</bdi> والنماذج <bdi dir="ltr">(Models)</bdi> والقوائم <bdi dir="ltr">ListView</bdi>.</p>
+      <p>آخر ما فعلته حسب سجل <bdi dir="ltr">Git</bdi>:</p>
+      <ul>
+        <li>أضفت شريط التنقل السفلي <bdi dir="ltr">BottomNavigationBar</bdi>.</li>
+        <li>أنشأت عنصرًا مشتركًا لعرض المهام <bdi dir="ltr">TasksListWidget</bdi>.</li>
+        <li>بدأت تبحث عن المهمة داخل القائمة الكاملة بواسطة <bdi dir="ltr">indexWhere</bdi>.</li>
+      </ul>
+      <p>الدروس السابقة في هذا المجلد: <bdi dir="ltr">map()</bdi>، و <bdi dir="ltr">factory</bdi> مع <bdi dir="ltr">JSON</bdi>، و <bdi dir="ltr">Git</bdi>، و <bdi dir="ltr">initState / setState</bdi>. هذا الدرس يربطها كلها معًا.</p>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p>You are in the course's <b>second project</b>: the Tasky to-do app. On the course map, you are inside <b>S7</b>, the section covering JSON, models and <code>ListView</code>.</p>
+      <p>Your latest work, according to the Git log:</p>
+      <ul>
+        <li>Added a <code>BottomNavigationBar</code>.</li>
+        <li>Built a shared <code>TasksListWidget</code>.</li>
+        <li>Started finding a task in the full list with <code>indexWhere</code>.</li>
+      </ul>
+      <p>Earlier lessons in this folder cover <code>map()</code>, <code>factory</code> + JSON, Git, and <code>initState / setState</code>. This lesson ties them all together.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="map">
+  <h2><bdi dir="ltr">2.</bdi> خريطة المشروع <span lang="en" dir="ltr">· Project map</span></h2>
+  <pre dir="ltr"><code>lib/
+├── main.dart                      → app entry, decides first screen
+├── models/
+│   └── task.dart                  → Task class + toJson / fromJson
+├── screens/
+│   ├── welcome_screen.dart        → asks for the user's name
+│   ├── main_screen.dart           → holds the BottomNavigationBar (4 tabs)
+│   ├── home_screen.dart           → tab 0: all tasks + "Add New Task" button
+│   ├── todo_tasks.dart            → tab 1: tasks not done yet
+│   ├── completed_tasks_screen.dart→ tab 2: tasks that are done
+│   ├── profile_screen.dart        → tab 3: empty (Placeholder)
+│   └── add_task.dart              → form to create a task
+└── widgets/
+    └── tasks_list_widget.dart     → shared list used by tabs 0, 1, 2</code></pre>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <p>الفكرة الأساسية: <b>كل المهام محفوظة في مكان واحد</b>، وهو مفتاح واحد اسمه <bdi dir="ltr">"tasks"</bdi> داخل <bdi dir="ltr">SharedPreferences</bdi>. كل شاشة تقرأ القائمة نفسها ثم تعرض جزءًا منها:</p>
+      <ul>
+        <li><bdi dir="ltr">HomeScreen</bdi>: تعرض كل المهام.</li>
+        <li><bdi dir="ltr">TodoTasks</bdi>: تعرض المهام التي قيمة <bdi dir="ltr">isDone</bdi> فيها <bdi dir="ltr">false</bdi>.</li>
+        <li><bdi dir="ltr">CompletedTasksScreen</bdi>: تعرض المهام التي قيمة <bdi dir="ltr">isDone</bdi> فيها <bdi dir="ltr">true</bdi>.</li>
+      </ul>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p>The core idea: <b>all tasks live in one place</b> — a single <code>"tasks"</code> key in <code>SharedPreferences</code>. Every screen reads that same list and shows a slice of it:</p>
+      <ul>
+        <li><code>HomeScreen</code>: all tasks.</li>
+        <li><code>TodoTasks</code>: tasks where <code>isDone</code> is <code>false</code>.</li>
+        <li><code>CompletedTasksScreen</code>: tasks where <code>isDone</code> is <code>true</code>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="start">
+  <h2><bdi dir="ltr">3.</bdi> ماذا يحدث عند تشغيل التطبيق؟ <span lang="en" dir="ltr">· What happens at startup</span></h2>
+  <pre dir="ltr"><code>void main() async {
+  WidgetsFlutterBinding.ensureInitialized();          // 1
+  final pref = await SharedPreferences.getInstance(); // 2
+  String? username = pref.getString('username');      // 3
+  runApp(MyApp(name: username));                      // 4
+}
+// inside MyApp.build:
+home: name == null ? WelcomeScreen() : MainScreen(),  // 5</code></pre>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <ol>
+        <li><bdi dir="ltr">ensureInitialized()</bdi>: نحتاجه لأننا نستخدم <bdi dir="ltr">await</bdi> قبل <bdi dir="ltr">runApp</bdi>. هو يجهّز <bdi dir="ltr">Flutter</bdi> للتواصل مع النظام.</li>
+        <li>نحصل على نسخة من <bdi dir="ltr">SharedPreferences</bdi> (تخزين بسيط على الجهاز بصيغة مفتاح وقيمة).</li>
+        <li>نقرأ الاسم. النوع <bdi dir="ltr">String?</bdi> يعني أن القيمة قد تكون <bdi dir="ltr">null</bdi>.</li>
+        <li>نشغّل التطبيق ونمرّر الاسم.</li>
+        <li>إذا لم يوجد اسم، فالمستخدم جديد، فنعرض شاشة الترحيب. وإلا نعرض الشاشة الرئيسية.</li>
+      </ol>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <ol>
+        <li><code>ensureInitialized()</code> is required because we <code>await</code> before <code>runApp</code>. It prepares Flutter to talk to the platform.</li>
+        <li>Get the <code>SharedPreferences</code> instance (simple key–value storage on the device).</li>
+        <li>Read the name. <code>String?</code> means it may be <code>null</code>.</li>
+        <li>Start the app, passing the name in.</li>
+        <li>No name → new user → <code>WelcomeScreen</code>. Otherwise → <code>MainScreen</code>.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="model">
+  <h2><bdi dir="ltr">4.</bdi> نموذج المهمة و <bdi dir="ltr">JSON</bdi> <span lang="en" dir="ltr">· The Task model and JSON</span></h2>
+  <pre dir="ltr"><code>class Task {
+  final String taskName;
+  final String taskDescription;
+  final bool isHighPriority;
+  bool isDone = false;            // not final: it changes when you tick the box
+
+  Map&lt;String, dynamic&gt; toJson() =&gt; {          // object → Map
+    'taskName': taskName, 'taskDescription': taskDescription,
+    'isHighPriority': isHighPriority, 'isDone': isDone,
+  };
+
+  factory Task.fromJson(Map&lt;String, dynamic&gt; json) {  // Map → object
+    return Task(
+      taskName: json["taskName"], ...,
+      isDone: json["isDone"] ?? false,     // old saved tasks had no isDone
+    );
+  }
+}</code></pre>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <p><bdi dir="ltr">SharedPreferences</bdi> لا يحفظ كائنات <bdi dir="ltr">Task</bdi> مباشرة. هو يحفظ نصًا <bdi dir="ltr">String</bdi> فقط. لذلك نحتاج إلى تحويل في الاتجاهين:</p>
+      <ul>
+        <li><bdi dir="ltr">toJson()</bdi>: يحوّل الكائن إلى <bdi dir="ltr">Map</bdi>.</li>
+        <li><bdi dir="ltr">Task.fromJson()</bdi>: يبني كائنًا من <bdi dir="ltr">Map</bdi>. هو <bdi dir="ltr">factory constructor</bdi> (مُنشئ يعيد كائنًا جاهزًا)، وقد شرحناه في الدرس <bdi dir="ltr">02</bdi>.</li>
+      </ul>
+      <p>لماذا <bdi dir="ltr">?? false</bdi>؟ لأن المهام القديمة حُفظت قبل إضافة الحقل <bdi dir="ltr">isDone</bdi>، فقيمته فيها <bdi dir="ltr">null</bdi>. العامل <bdi dir="ltr">??</bdi> يعني: «إن كانت القيمة <bdi dir="ltr">null</bdi> فاستخدم البديل».</p>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p><code>SharedPreferences</code> cannot store a <code>Task</code> object — only a <code>String</code>. So we convert both ways:</p>
+      <ul>
+        <li><code>toJson()</code>: object → <code>Map</code>.</li>
+        <li><code>Task.fromJson()</code>: <code>Map</code> → object. It's a <code>factory</code> constructor (covered in lesson 02).</li>
+      </ul>
+      <p>Why <code>?? false</code>? Tasks saved before you added <code>isDone</code> don't have that key, so it reads as <code>null</code>. <code>??</code> means "if null, use this fallback".</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="storage">
+  <h2><bdi dir="ltr">5.</bdi> دورة الحفظ والقراءة <span lang="en" dir="ltr">· The save / load cycle</span></h2>
+  <pre dir="ltr" class="flow"><code>SAVE:  Task ──toJson()──▶ Map ──list.add──▶ List&lt;Map&gt; ──jsonEncode──▶ String ──setString("tasks")──▶ disk
+
+LOAD:  disk ──getString("tasks")──▶ String ──jsonDecode──▶ List&lt;dynamic&gt; ──map(Task.fromJson)──▶ List&lt;Task&gt;</code></pre>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <p>هذه أهم فكرة في المشروع كله. عند إضافة مهمة في <bdi dir="ltr">add_task.dart</bdi>:</p>
+      <ol>
+        <li>نقرأ النص المحفوظ القديم.</li>
+        <li>نحوّله إلى قائمة بواسطة <bdi dir="ltr">jsonDecode</bdi>.</li>
+        <li>نضيف المهمة الجديدة بصيغة <bdi dir="ltr">Map</bdi>.</li>
+        <li>نحوّل القائمة كلها إلى نص بواسطة <bdi dir="ltr">jsonEncode</bdi> ونحفظها.</li>
+      </ol>
+      <p><b>قاعدة مهمة:</b> نحن نحفظ <b>القائمة الكاملة</b> في كل مرة. إذا حفظنا جزءًا من القائمة فقط، تضيع بقية المهام. تذكّر هذه القاعدة، لأنك ستحتاجها في قسم المشكلات.</p>
+      <p>ملاحظة: <bdi dir="ltr">jsonEncode(taskMapped)</bdi> يعمل مباشرة على <bdi dir="ltr">List&lt;Task&gt;</bdi> لأن <bdi dir="ltr">jsonEncode</bdi> يستدعي <bdi dir="ltr">toJson()</bdi> تلقائيًا على كل كائن.</p>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p>This is the single most important idea in the project. When adding a task in <code>add_task.dart</code>:</p>
+      <ol>
+        <li>Read the old saved string.</li>
+        <li>Turn it into a list with <code>jsonDecode</code>.</li>
+        <li>Add the new task as a <code>Map</code>.</li>
+        <li><code>jsonEncode</code> the whole list back to a string and save it.</li>
+      </ol>
+      <p><b>Key rule:</b> you always save the <b>whole list</b>. Save only part of it and the other tasks are gone. Keep this rule in mind — the bugs section depends on it.</p>
+      <p>Note: <code>jsonEncode(taskMapped)</code> works directly on a <code>List&lt;Task&gt;</code> because <code>jsonEncode</code> calls each object's <code>toJson()</code> automatically.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="state">
+  <h2><bdi dir="ltr">6.</bdi> الحالة وإعادة الرسم <span lang="en" dir="ltr">· State and rebuilding</span></h2>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <p>كل شاشة قائمة هي <bdi dir="ltr">StatefulWidget</bdi>، والنمط فيها واحد:</p>
+      <ol>
+        <li><bdi dir="ltr">initState()</bdi> يعمل مرة واحدة عند فتح الشاشة، ويستدعي <bdi dir="ltr">_loadTasks()</bdi>.</li>
+        <li><bdi dir="ltr">_loadTasks()</bdi> دالة <bdi dir="ltr">async</bdi>، فهي تنتظر القراءة من التخزين.</li>
+        <li>بعد وصول البيانات نستدعي <bdi dir="ltr">setState()</bdi>، فيعيد <bdi dir="ltr">Flutter</bdi> تشغيل <bdi dir="ltr">build()</bdi> ويعرض القائمة.</li>
+      </ol>
+      <p>عند الضغط على مربع الاختيار <bdi dir="ltr">Checkbox</bdi> نفعل شيئين: نغيّر <bdi dir="ltr">isDone</bdi> داخل <bdi dir="ltr">setState</bdi> لتتحدث الواجهة فورًا، ثم نحفظ في التخزين ليبقى التغيير بعد إغلاق التطبيق.</p>
+      <p>التفاصيل الكاملة موجودة في الدرس <bdi dir="ltr">04</bdi>.</p>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p>Every list screen is a <code>StatefulWidget</code> with the same pattern:</p>
+      <ol>
+        <li><code>initState()</code> runs once when the screen opens and calls <code>_loadTasks()</code>.</li>
+        <li><code>_loadTasks()</code> is <code>async</code>: it waits for storage.</li>
+        <li>When data arrives, <code>setState()</code> makes Flutter re-run <code>build()</code> and show the list.</li>
+      </ol>
+      <p>Ticking a <code>Checkbox</code> does two things: change <code>isDone</code> inside <code>setState</code> so the UI updates now, then save to storage so the change survives an app restart.</p>
+      <p>Full details are in lesson 04.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="forms">
+  <h2><bdi dir="ltr">7.</bdi> النماذج والتحقق من الإدخال <span lang="en" dir="ltr">· Forms and validation</span></h2>
+  <pre dir="ltr"><code>final GlobalKey&lt;FormState&gt; _key = GlobalKey&lt;FormState&gt;();
+
+Form(key: _key, child: ... TextFormField(
+  controller: taskNameController,
+  validator: (value) =&gt; value!.trim().isEmpty ? "Task name is required" : null,
+))
+
+if (_key.currentState?.validate() ?? false) { /* save */ }</code></pre>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <ul>
+        <li><bdi dir="ltr">TextEditingController</bdi>: يتيح لنا قراءة النص المكتوب (<bdi dir="ltr">.text</bdi>) ومسحه (<bdi dir="ltr">.clear()</bdi>).</li>
+        <li><bdi dir="ltr">validator</bdi>: يعيد رسالة خطأ إذا كان الإدخال غير صالح، ويعيد <bdi dir="ltr">null</bdi> إذا كان صالحًا.</li>
+        <li><bdi dir="ltr">GlobalKey&lt;FormState&gt;</bdi>: مفتاح يربطنا بالنموذج، فنستطيع استدعاء <bdi dir="ltr">validate()</bdi> على كل الحقول مرة واحدة.</li>
+        <li><bdi dir="ltr">Switch</bdi>: لاختيار الأولوية العالية، ويُحدَّث بواسطة <bdi dir="ltr">setState</bdi>.</li>
+      </ul>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <ul>
+        <li><code>TextEditingController</code>: read the typed text (<code>.text</code>) and clear it (<code>.clear()</code>).</li>
+        <li><code>validator</code>: return an error message if invalid, <code>null</code> if valid.</li>
+        <li><code>GlobalKey&lt;FormState&gt;</code>: a handle to the form so you can call <code>validate()</code> on all fields at once.</li>
+        <li><code>Switch</code>: high-priority toggle, updated with <code>setState</code>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="nav">
+  <h2><bdi dir="ltr">8.</bdi> التنقل بين الشاشات <span lang="en" dir="ltr">· Navigation</span></h2>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>الطريقة</th><th>المعنى</th><th lang="en" dir="ltr">Meaning</th><th>مكانها في المشروع</th></tr></thead>
+    <tbody>
+      <tr><td><bdi dir="ltr">Navigator.push</bdi></td><td>يفتح شاشة فوق الحالية، ويمكن الرجوع</td><td lang="en" dir="ltr">Opens a screen on top; Back works</td><td><bdi dir="ltr">Home → AddTask</bdi></td></tr>
+      <tr><td><bdi dir="ltr">Navigator.pushReplacement</bdi></td><td>يستبدل الشاشة الحالية، فلا رجوع إليها</td><td lang="en" dir="ltr">Replaces the current screen; no Back</td><td><bdi dir="ltr">Welcome → Home</bdi>، <bdi dir="ltr">AddTask → MainScreen</bdi></td></tr>
+      <tr><td><bdi dir="ltr">BottomNavigationBar</bdi></td><td>يغيّر <bdi dir="ltr">_currentIndex</bdi> ويعرض <bdi dir="ltr">Screens[_currentIndex]</bdi></td><td lang="en" dir="ltr">Changes <code>_currentIndex</code>, shows <code>Screens[_currentIndex]</code></td><td><bdi dir="ltr">MainScreen</bdi></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="pair shared">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <p>ملاحظة: عند الانتقال إلى تبويب آخر، تُبنى الشاشة من جديد، فيعمل <bdi dir="ltr">initState</bdi> مرة أخرى ويعيد قراءة المهام. لهذا تظهر البيانات محدّثة عند التنقل بين التبويبات.</p>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p>Note: switching tabs rebuilds the screen from scratch, so <code>initState</code> runs again and reloads tasks. That's why each tab shows fresh data.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="list">
+  <h2><bdi dir="ltr">9.</bdi> عنصر القائمة المشترك <span lang="en" dir="ltr">· The shared TasksListWidget</span></h2>
+  <pre dir="ltr"><code>class TasksListWidget extends StatelessWidget {
+  final List&lt;Task&gt; task;
+  final Function(bool?, int?) onTaskChanged;   // a callback
+  ...
+  ListView.separated(
+    itemCount: task.length,
+    separatorBuilder: (context, index) =&gt; SizedBox(height: 8),
+    itemBuilder: (context, index) =&gt; ... Checkbox(
+      value: task[index].isDone,
+      onChanged: (value) =&gt; onTaskChanged(value, index),
+    ),
+  )
+}</code></pre>
+  <div class="pair">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <p>بدل تكرار كود القائمة في ثلاث شاشات، أنشأت عنصرًا واحدًا. لاحظ الفكرة المهمة: العنصر <b>لا يعرف</b> ماذا يفعل عند الضغط. هو فقط يستدعي الدالة <bdi dir="ltr">onTaskChanged</bdi> ويعطيها القيمة والرقم <bdi dir="ltr">index</bdi>. كل شاشة تقرّر بنفسها ماذا تفعل. هذا اسمه <bdi dir="ltr">callback</bdi> (دالة تُمرَّر ليُستدعى بها لاحقًا).</p>
+      <p><bdi dir="ltr">ListView.separated</bdi> يبني العناصر عند الحاجة فقط، ويضع فاصلًا بين كل عنصرين.</p>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p>Instead of repeating list code in three screens, you made one widget. The key idea: the widget <b>does not know</b> what to do on tap. It just calls <code>onTaskChanged</code> with the value and the <code>index</code>; each screen decides what happens. That's a <b>callback</b>.</p>
+      <p><code>ListView.separated</code> builds items lazily and puts a separator between them.</p>
+    </div>
+  </div>
+  <div class="pair shared">
+    <div class="ar">
+      <span class="lang">العربية</span>
+      <h3>مشكلة الـ <bdi dir="ltr">index</bdi></h3>
+      <p>في شاشة <bdi dir="ltr">TodoTasks</bdi> القائمة <b>مفلترة</b>. الرقم <bdi dir="ltr">index = 0</bdi> فيها قد يكون المهمة الثالثة في القائمة الكاملة. لذلك بدأت آخر مرة تستخدم <bdi dir="ltr">indexWhere</bdi> لتجد المكان الصحيح في القائمة الكاملة. هذه هي النقطة التي توقفت عندها بالضبط.</p>
+    </div>
+    <div class="en" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <h3>The index problem</h3>
+      <p>In <code>TodoTasks</code> the list is <b>filtered</b>. <code>index = 0</code> there might be the third task in the full list. That's why your last commit uses <code>indexWhere</code> to find the matching position in the full list. This is exactly where you stopped.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="bugs">
+  <h2><bdi dir="ltr">10.</bdi> مشكلات وجدتها في الكود الحالي <span lang="en" dir="ltr">· Bugs in the current code</span></h2>
+  <p>هذه ملاحظات من قراءة الكود، ولم أعدّل أي ملف. <span lang="en" dir="ltr">(From reading the code — no files were changed.)</span></p>
+
+  <div class="bug">
+    <div class="pair">
+      <div class="ar">
+        <b><bdi dir="ltr">1.</bdi> حفظ الجزء بدل الكل — يحذف المهام المنجزة</b>
+        <p>في <bdi dir="ltr">todo_tasks.dart</bdi> السطر <bdi dir="ltr">71</bdi>، بعد أن حدّثت القائمة الكاملة <bdi dir="ltr">All_data_task</bdi>، يحفظ الكود القائمة المفلترة <bdi dir="ltr">taskMapped</bdi>. النتيجة: كل المهام المنجزة تختفي من التخزين. هذه مخالفة مباشرة للقاعدة في القسم <bdi dir="ltr">5</bdi>.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <b>1. Saving the slice, not the whole — deletes completed tasks</b>
+        <p>In <code>todo_tasks.dart</code> line 71, after updating the full list <code>All_data_task</code>, the code saves the filtered <code>taskMapped</code>. Result: every completed task is wiped from storage. A direct break of the rule in section 5.</p>
+      </div>
+    </div>
+    <pre dir="ltr"><code>pref.setString("tasks", jsonEncode(taskMapped));     // ✗ current
+pref.setString("tasks", jsonEncode(All_data_task));  // ✓ should be</code></pre>
+  </div>
+
+  <div class="bug">
+    <div class="pair">
+      <div class="ar">
+        <b><bdi dir="ltr">2.</bdi> فك ترميز نص فارغ — توقف الشاشة</b>
+        <p>في <bdi dir="ltr">completed_tasks_screen.dart</bdi> السطر <bdi dir="ltr">25</bdi>: إذا لم توجد مهام محفوظة، يصبح الاستدعاء <bdi dir="ltr">jsonDecode("")</bdi>، وهذا يرمي خطأ <bdi dir="ltr">FormatException</bdi>. النص الفارغ ليس <bdi dir="ltr">JSON</bdi> صالحًا. استخدم <bdi dir="ltr">'[]'</bdi> كما فعلت في <bdi dir="ltr">todo_tasks.dart</bdi>.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <b>2. Decoding an empty string — screen crashes</b>
+        <p>In <code>completed_tasks_screen.dart</code> line 25: with no saved tasks this becomes <code>jsonDecode("")</code>, which throws a <code>FormatException</code> — an empty string isn't valid JSON. Use <code>'[]'</code> as you did in <code>todo_tasks.dart</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bug">
+    <div class="pair">
+      <div class="ar">
+        <b><bdi dir="ltr">3.</bdi> شاشة الترحيب تفتح الشاشة الخطأ</b>
+        <p>في <bdi dir="ltr">welcome_screen.dart</bdi> السطر <bdi dir="ltr">114</bdi> ينتقل الكود إلى <bdi dir="ltr">HomeScreen</bdi>، وليس إلى <bdi dir="ltr">MainScreen</bdi>. لذلك لا يظهر شريط التنقل السفلي للمستخدم الجديد حتى يعيد فتح التطبيق.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <b>3. Welcome screen opens the wrong screen</b>
+        <p><code>welcome_screen.dart</code> line 114 navigates to <code>HomeScreen</code> instead of <code>MainScreen</code>, so a new user sees no bottom bar until they restart the app.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bug">
+    <div class="pair">
+      <div class="ar">
+        <b><bdi dir="ltr">4.</bdi> البحث بالاسم غير آمن</b>
+        <p><bdi dir="ltr">indexWhere</bdi> يبحث بواسطة <bdi dir="ltr">taskName</bdi>. إذا وُجدت مهمتان بالاسم نفسه، فسيحدّث الكود المهمة الأولى دائمًا. وإذا لم يجد المهمة، فيعيد <bdi dir="ltr">-1</bdi> فيتوقف التطبيق. الحل لاحقًا: إضافة <bdi dir="ltr">id</bdi> فريد لكل مهمة.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <b>4. Matching by name is fragile</b>
+        <p><code>indexWhere</code> matches on <code>taskName</code>. Two tasks with the same name → it always updates the first. Not found → returns <code>-1</code> → crash. Later fix: give every task a unique <code>id</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bug">
+    <div class="pair">
+      <div class="ar">
+        <b><bdi dir="ltr">5.</bdi> ملاحظات أصغر</b>
+        <ul>
+          <li>في <bdi dir="ltr">add_task.dart</bdi> المتحكمات <bdi dir="ltr">Controllers</bdi> والمفتاح <bdi dir="ltr">_key</bdi> معرّفة خارج الكلاس، فهي متغيرات عامة. الأفضل وضعها داخل <bdi dir="ltr">_AddTaskState</bdi>.</li>
+          <li>في <bdi dir="ltr">todo_tasks.dart</bdi> يوجد <bdi dir="ltr">Future.delayed</bdi> داخل <bdi dir="ltr">setState</bdi>. يجب أن يحتوي <bdi dir="ltr">setState</bdi> على تغيير البيانات فقط.</li>
+          <li>ينقص <bdi dir="ltr">@override</bdi> فوق <bdi dir="ltr">initState</bdi> في شاشتين.</li>
+        </ul>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <b>5. Smaller notes</b>
+        <ul>
+          <li><code>add_task.dart</code>: the controllers and <code>_key</code> are top-level globals; move them into <code>_AddTaskState</code>.</li>
+          <li><code>todo_tasks.dart</code>: <code>Future.delayed</code> sits inside <code>setState</code>. Keep <code>setState</code> for data changes only.</li>
+          <li><code>@override</code> is missing above <code>initState</code> in two screens.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="next">
+  <h2><bdi dir="ltr">11.</bdi> ما التالي؟ <span lang="en" dir="ltr">· What's next</span></h2>
+  <div class="pair">
+    <div class="ar here">
+      <span class="lang">العربية</span>
+      <p>بقي من القسم <bdi dir="ltr">S7</bdi> حسب خريطة الدورة: <bdi dir="ltr">Stack</bdi>، و <bdi dir="ltr">Divider</bdi>، و <bdi dir="ltr">ListTile</bdi>، و <bdi dir="ltr">Slivers</bdi>.</p>
+      <p>بعده القسم <bdi dir="ltr">S8</bdi>: العناصر المشتركة و <bdi dir="ltr">Preferences Manager</bdi>. هذا القسم سيحل مشكلة تكرار <bdi dir="ltr">SharedPreferences.getInstance()</bdi> و <bdi dir="ltr">jsonDecode</bdi> في كل شاشة.</p>
+    </div>
+    <div class="en here" lang="en" dir="ltr">
+      <span class="lang">English</span>
+      <p>Still left in S7 per the course map: <code>Stack</code>, <code>Divider</code>, <code>ListTile</code>, and slivers.</p>
+      <p>Then S8: shared components and a Preferences Manager — which will remove the repeated <code>SharedPreferences.getInstance()</code> + <code>jsonDecode</code> code from every screen.</p>
+    </div>
+  </div>
+</section>
+
+<section id="action">
+  <h2>خطوتك الآن <span lang="en" dir="ltr">· Your one action now</span></h2>
+  <div class="action">
+    <div class="pair">
+      <div class="ar">
+        <p>أصلح المشكلة رقم <bdi dir="ltr">1</bdi> في <bdi dir="ltr">todo_tasks.dart</bdi>. ثم جرّب: أضف مهمتين، وأنجز واحدة من تبويب <bdi dir="ltr">To Do</bdi>، ثم افتح تبويب <bdi dir="ltr">Completed</bdi>. يجب أن تظهر المهمة هناك.</p>
+        <p>عندما تنتهي، أخبرني إن أردت اختبارًا قصيرًا لمراجعة هذا الدرس.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <p>Fix bug 1 in <code>todo_tasks.dart</code>. Then test it: add two tasks, complete one from the To Do tab, open the Completed tab — it should be there.</p>
+        <p>When you're done, tell me if you'd like a short check on this recap.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+</body>
+</html>
