@@ -59,6 +59,9 @@
   .here { background: var(--accent-bg); border-inline-start: 4px solid var(--accent); border-radius: 8px; padding: 10px 14px; }
   .action { background: var(--accent-bg); border: 2px solid var(--accent); border-radius: 12px; padding: 14px 18px; }
   .shared { margin-top: 10px; }
+  .sub { margin-top: 22px; }
+  .sub > h3 { color: var(--accent); }
+  .tip { background: var(--accent-bg); border-inline-start: 4px solid var(--accent); border-radius: 8px; padding: 8px 14px; margin: 10px 0; }
   a { color: var(--accent); }
   @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } nav ol { columns: 1; } }
   @media print { nav { display: none; } .wrap { max-width: none; padding: 0; } }
@@ -76,9 +79,9 @@
     <li><a href="#where">أين توقفت؟ <span lang="en" dir="ltr">/ Where you stopped</span></a></li>
     <li><a href="#map">خريطة المشروع <span lang="en" dir="ltr">/ Project map</span></a></li>
     <li><a href="#start">تشغيل التطبيق <span lang="en" dir="ltr">/ App startup</span></a></li>
-    <li><a href="#model">نموذج المهمة و <bdi dir="ltr">JSON</bdi> <span lang="en" dir="ltr">/ Task model</span></a></li>
+    <li><a href="#model">نموذج المهمة: درس <bdi dir="ltr">OOP</bdi> و <bdi dir="ltr">factory</bdi> <span lang="en" dir="ltr">/ Task model (OOP)</span></a></li>
     <li><a href="#storage">دورة الحفظ <span lang="en" dir="ltr">/ Storage cycle</span></a></li>
-    <li><a href="#state">الحالة وإعادة الرسم <span lang="en" dir="ltr">/ State</span></a></li>
+    <li><a href="#state"><bdi dir="ltr">Stateless</bdi> و <bdi dir="ltr">Stateful</bdi> <span lang="en" dir="ltr">/ Widgets &amp; state</span></a></li>
     <li><a href="#forms">النماذج والتحقق <span lang="en" dir="ltr">/ Forms</span></a></li>
     <li><a href="#nav">التنقل <span lang="en" dir="ltr">/ Navigation</span></a></li>
     <li><a href="#list">القائمة المشتركة <span lang="en" dir="ltr">/ Shared list widget</span></a></li>
@@ -194,44 +197,263 @@ home: name == null ? WelcomeScreen() : MainScreen(),  // 5</code></pre>
 
 <!-- 4 -->
 <section id="model">
-  <h2><bdi dir="ltr">4.</bdi> نموذج المهمة و <bdi dir="ltr">JSON</bdi> <span lang="en" dir="ltr">· The Task model and JSON</span></h2>
-  <pre dir="ltr"><code>class Task {
-  final String taskName;
+  <h2><bdi dir="ltr">4.</bdi> نموذج المهمة: درس في <bdi dir="ltr">OOP</bdi> <span lang="en" dir="ltr">· The Task model as an OOP lesson</span></h2>
+  <p>هذا هو الملف <bdi dir="ltr">lib/models/task.dart</bdi> كاملًا كما هو في مشروعك. سنشرحه جزءًا جزءًا. <span lang="en" dir="ltr">(Your real file, explained piece by piece.)</span></p>
+  <pre dir="ltr"><code>class Task {                                   // ① the class (blueprint)
+  final String taskName;                       // ② fields
   final String taskDescription;
   final bool isHighPriority;
-  bool isDone = false;            // not final: it changes when you tick the box
+  bool isDone = false;                         //    not final: it changes
 
-  Map&lt;String, dynamic&gt; toJson() =&gt; {          // object → Map
-    'taskName': taskName, 'taskDescription': taskDescription,
-    'isHighPriority': isHighPriority, 'isDone': isDone,
+  Task({                                       // ③ constructor
+    required this.taskName,
+    required this.taskDescription,
+    required this.isHighPriority,
+    this.isDone = false,
+  });
+
+  Map&lt;String, dynamic&gt; toJson() =&gt; {          // ④ method: object → Map
+    'taskName': taskName,
+    'taskDescription': taskDescription,
+    'isHighPriority': isHighPriority,
+    'isDone' : isDone,
   };
 
-  factory Task.fromJson(Map&lt;String, dynamic&gt; json) {  // Map → object
+  factory Task.fromJson(Map&lt;String, dynamic&gt; json) {  // ⑤ factory: Map → object
     return Task(
-      taskName: json["taskName"], ...,
-      isDone: json["isDone"] ?? false,     // old saved tasks had no isDone
+      taskName: json["taskName"],
+      taskDescription: json["taskDescription"],
+      isHighPriority: json["isHighPriority"],
+      isDone: json["isDone"] ?? false          // ⑥ old tasks had no isDone
     );
   }
 }</code></pre>
-  <div class="pair">
-    <div class="ar">
-      <span class="lang">العربية</span>
-      <p><bdi dir="ltr">SharedPreferences</bdi> لا يحفظ كائنات <bdi dir="ltr">Task</bdi> مباشرة. هو يحفظ نصًا <bdi dir="ltr">String</bdi> فقط. لذلك نحتاج إلى تحويل في الاتجاهين:</p>
-      <ul>
-        <li><bdi dir="ltr">toJson()</bdi>: يحوّل الكائن إلى <bdi dir="ltr">Map</bdi>.</li>
-        <li><bdi dir="ltr">Task.fromJson()</bdi>: يبني كائنًا من <bdi dir="ltr">Map</bdi>. هو <bdi dir="ltr">factory constructor</bdi> (مُنشئ يعيد كائنًا جاهزًا)، وقد شرحناه في الدرس <bdi dir="ltr">02</bdi>.</li>
-      </ul>
-      <p>لماذا <bdi dir="ltr">?? false</bdi>؟ لأن المهام القديمة حُفظت قبل إضافة الحقل <bdi dir="ltr">isDone</bdi>، فقيمته فيها <bdi dir="ltr">null</bdi>. العامل <bdi dir="ltr">??</bdi> يعني: «إن كانت القيمة <bdi dir="ltr">null</bdi> فاستخدم البديل».</p>
+
+  <!-- 4.1 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">①</bdi> الكلاس والكائن <span lang="en" dir="ltr">· Class vs object</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p><b>الكلاس</b> قالب أو تصميم. <b>الكائن</b> <bdi dir="ltr">(Object)</bdi> شيء حقيقي مصنوع من هذا القالب.</p>
+        <p>مثال: استمارة فارغة هي الكلاس، وكل استمارة ملأها شخص هي كائن. القالب واحد، والكائنات كثيرة.</p>
+        <p>كل كائن له نسخته الخاصة من البيانات. إذا أصبحت <bdi dir="ltr">t1.isDone</bdi> تساوي <bdi dir="ltr">true</bdi>، تبقى <bdi dir="ltr">t2.isDone</bdi> كما هي.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>A <b>class</b> is a blueprint. An <b>object</b> is a real thing built from it.</p>
+        <p>Think of a blank form (class) and each filled-in copy (object). One blueprint, many objects.</p>
+        <p>Each object has its own copy of the data: changing <code>t1.isDone</code> does not touch <code>t2</code>.</p>
+      </div>
     </div>
-    <div class="en" lang="en" dir="ltr">
-      <span class="lang">English</span>
-      <p><code>SharedPreferences</code> cannot store a <code>Task</code> object — only a <code>String</code>. So we convert both ways:</p>
-      <ul>
-        <li><code>toJson()</code>: object → <code>Map</code>.</li>
-        <li><code>Task.fromJson()</code>: <code>Map</code> → object. It's a <code>factory</code> constructor (covered in lesson 02).</li>
-      </ul>
-      <p>Why <code>?? false</code>? Tasks saved before you added <code>isDone</code> don't have that key, so it reads as <code>null</code>. <code>??</code> means "if null, use this fallback".</p>
+    <pre dir="ltr"><code>Task t1 = Task(taskName: "Study", taskDescription: "", isHighPriority: true);
+Task t2 = Task(taskName: "Gym",   taskDescription: "", isHighPriority: false);</code></pre>
+  </div>
+
+  <!-- 4.2 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">②</bdi> الحقول و <bdi dir="ltr">final</bdi> <span lang="en" dir="ltr">· Fields and final</span></h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>الحقل</th><th><bdi dir="ltr">final</bdi>؟</th><th>السبب</th><th lang="en" dir="ltr">Why</th></tr></thead>
+      <tbody>
+        <tr><td><bdi dir="ltr">taskName</bdi></td><td>✅</td><td>اسم المهمة يُحدَّد مرة واحدة ولا يتغير</td><td lang="en" dir="ltr">Set once, never changes</td></tr>
+        <tr><td><bdi dir="ltr">taskDescription</bdi></td><td>✅</td><td>نفس السبب</td><td lang="en" dir="ltr">Same</td></tr>
+        <tr><td><bdi dir="ltr">isHighPriority</bdi></td><td>✅</td><td>نفس السبب</td><td lang="en" dir="ltr">Same</td></tr>
+        <tr><td><bdi dir="ltr">isDone</bdi></td><td>❌</td><td>يتغير كلما ضغط المستخدم على مربع الاختيار</td><td lang="en" dir="ltr">Changes on every checkbox tap</td></tr>
+      </tbody>
+    </table>
     </div>
+    <pre dir="ltr"><code>t1.taskName = "Other";  // ✗ compile error: taskName is final
+t1.isDone = true;       // ✓ allowed</code></pre>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p><b>الفكرة:</b> عندما تمنع تغيير ما لا يجب أن يتغير، يحميك المترجم <bdi dir="ltr">(compiler)</bdi> من الأخطاء قبل أن يعمل التطبيق.</p>
+        <p>و <bdi dir="ltr">isDone = false</bdi> تعني <b>قيمة افتراضية</b>: كل مهمة جديدة تبدأ غير منجزة.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p><b>The idea:</b> lock what shouldn't change, and the compiler catches mistakes before the app runs.</p>
+        <p><code>isDone = false</code> is a <b>default value</b>: every new task starts not done.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.3 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">③</bdi> المُنشئ <span lang="en" dir="ltr">· The constructor</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>المُنشئ <bdi dir="ltr">(Constructor)</bdi> هو ما يعمل عندما تكتب <bdi dir="ltr">Task(...)</bdi>. وظيفته أن يملأ الحقول.</p>
+        <ul>
+          <li>الأقواس <bdi dir="ltr">{ }</bdi> تعني <b>معاملات مسمّاة</b> <bdi dir="ltr">(named parameters)</bdi>، فتكتب اسم كل معامل عند الاستدعاء: <bdi dir="ltr">Task(taskName: "...")</bdi>.</li>
+          <li><bdi dir="ltr">required</bdi> تعني أن المعامل إجباري، وإلا لن يُترجَم الكود.</li>
+          <li><bdi dir="ltr">this.taskName</bdi> اختصار معناه: «خذ القيمة القادمة وضعها في الحقل <bdi dir="ltr">taskName</bdi>».</li>
+        </ul>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>The constructor runs when you write <code>Task(...)</code>. Its job: fill the fields.</p>
+        <ul>
+          <li><code>{ }</code> = <b>named parameters</b>: you write each name when calling.</li>
+          <li><code>required</code> = must be passed, or the code won't compile.</li>
+          <li><code>this.taskName</code> = "put the incoming value into the field <code>taskName</code>".</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.4 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">④</bdi> الدالة <bdi dir="ltr">toJson()</bdi> <span lang="en" dir="ltr">· A method: object → Map</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p><b>الدالة</b> <bdi dir="ltr">(Method)</bdi> هي <bdi dir="ltr">function</bdi> تعيش داخل الكلاس وتعمل على بيانات الكائن نفسه.</p>
+        <p><b>لماذا نحتاجها؟</b> <bdi dir="ltr">SharedPreferences</bdi> لا يعرف ما هو <bdi dir="ltr">Task</bdi>. هو يفهم النصوص فقط. لذلك نحوّل الكائن إلى <bdi dir="ltr">Map</bdi>، ثم يحوّل <bdi dir="ltr">jsonEncode</bdi> الـ <bdi dir="ltr">Map</bdi> إلى نص.</p>
+        <ul>
+          <li><bdi dir="ltr">=&gt;</bdi> اختصار لـ <bdi dir="ltr">{ return ...; }</bdi> عندما تكون الدالة سطرًا واحدًا.</li>
+          <li><bdi dir="ltr">Map&lt;String, dynamic&gt;</bdi>: المفاتيح كلها نصوص، والقيم من أي نوع (<bdi dir="ltr">String</bdi> أو <bdi dir="ltr">bool</bdi>)، لذلك نكتب <bdi dir="ltr">dynamic</bdi>.</li>
+        </ul>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>A <b>method</b> is a function that lives inside the class and works on that object's data.</p>
+        <p><b>Why?</b> <code>SharedPreferences</code> doesn't know what a <code>Task</code> is — only text. So: object → <code>Map</code> → <code>jsonEncode</code> → <code>String</code>.</p>
+        <ul>
+          <li><code>=&gt;</code> is shorthand for <code>{ return ...; }</code>.</li>
+          <li><code>Map&lt;String, dynamic&gt;</code>: keys are strings, values can be any type.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.5 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">⑤</bdi> ما هو <bdi dir="ltr">factory constructor</bdi>؟ <span lang="en" dir="ltr">· What is a factory constructor?</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p><b>المُنشئ العادي</b> عندما تكتب <bdi dir="ltr">Task(...)</bdi> يفعل ثلاثة أشياء <b>تلقائيًا</b>:</p>
+        <ol>
+          <li>يحجز مكانًا في الذاكرة لكائن <b>جديد</b>.</li>
+          <li>يملأ الحقول بالقيم.</li>
+          <li>يعيد هذا الكائن.</li>
+        </ol>
+        <p>ولا تتحكم أنت في هذه الخطوات: لا تستطيع كتابة <bdi dir="ltr">return</bdi>، ولا إعادة كائن قديم.</p>
+        <p><b>كلمة <bdi dir="ltr">factory</bdi></b> تقول لـ <bdi dir="ltr">Dart</bdi>: «لا تصنع كائنًا وحدك، أنا سأقرّر ماذا أعيد». فهي في الحقيقة <bdi dir="ltr">function</bdi> عادية، لكن شكلها من الخارج يشبه المُنشئ.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>A <b>normal constructor</b> does three things <b>automatically</b>: reserve memory for a <b>new</b> object, fill the fields, return it. You can't write <code>return</code> or hand back an old object.</p>
+        <p>The word <b><code>factory</code></b> tells Dart: "don't create an object yourself — I'll decide what to return." It's really a plain function that looks like a constructor from the outside.</p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <p><b>تشبيه 🍔:</b> المُنشئ العادي مثل <b>آلة</b>: تضع المكونات فيخرج ساندويتش جديد دائمًا. أما <bdi dir="ltr">factory</bdi> فمثل <b>الكاشير</b>: تطلب ساندويتش، وهو يقرّر: يصنعه من جديد، أو يعطيك واحدًا جاهزًا. أنت في النهاية تستلم ساندويتش.</p>
+      <p lang="en" dir="ltr"><b>Analogy:</b> a normal constructor is a machine — always a fresh sandwich. A factory is a cashier — they decide whether to make one or hand you a ready one.</p>
+    </div>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th></th><th>المُنشئ العادي</th><th><bdi dir="ltr">factory</bdi></th><th lang="en" dir="ltr">Normal vs factory</th></tr></thead>
+      <tbody>
+        <tr><td>يصنع كائنًا جديدًا تلقائيًا؟</td><td>✅ دائمًا</td><td>❌ أنت تصنعه</td><td lang="en" dir="ltr">Auto-creates a new object?</td></tr>
+        <tr><td>يمكن كتابة <bdi dir="ltr">return</bdi>؟</td><td>❌</td><td>✅ وإجباري</td><td lang="en" dir="ltr">Can use <code>return</code>?</td></tr>
+        <tr><td>يمكن إعادة كائن موجود سابقًا؟</td><td>❌</td><td>✅</td><td lang="en" dir="ltr">Can return an existing object?</td></tr>
+        <tr><td>يمكن استخدام <bdi dir="ltr">this</bdi> داخله؟</td><td>✅</td><td>❌ لا يوجد كائن بعد</td><td lang="en" dir="ltr">Can use <code>this</code>?</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pair shared">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <h3>لماذا لا يوجد <bdi dir="ltr">this</bdi> داخل <bdi dir="ltr">factory</bdi>؟</h3>
+        <p>داخل المُنشئ العادي يكون الكائن <b>قد صُنع</b> وأنت تملؤه، فـ <bdi dir="ltr">this</bdi> يشير إليه. أما داخل <bdi dir="ltr">factory</bdi> فلا يوجد كائن بعد. لذلك داخل <bdi dir="ltr">fromJson</bdi> نستدعي <bdi dir="ltr">Task(...)</bdi> العادي ليصنع الكائن فعلًا.</p>
+        <p>أي أن <bdi dir="ltr">factory</bdi> <b>لا يبني</b>: هو يجهّز البيانات ويعطيها للمُنشئ العادي الذي يبني.</p>
+        <h3><bdi dir="ltr">Task.fromJson</bdi>: مُنشئ له اسم</h3>
+        <p>لا تسمح <bdi dir="ltr">Dart</bdi> بمُنشئين لهما الاسم نفسه، لذلك نعطي المُنشئ الثاني اسمًا بعد النقطة: <bdi dir="ltr">Task.fromJson</bdi>. هذا اسمه <bdi dir="ltr">named constructor</bdi>.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <h3>Why no <code>this</code> inside a factory?</h3>
+        <p>In a normal constructor the object <b>already exists</b> while you fill it. In a factory there's no object yet — so <code>fromJson</code> calls the normal <code>Task(...)</code> to actually build it.</p>
+        <p>The factory doesn't build; it prepares the data and hands it to the real constructor.</p>
+        <h3><code>Task.fromJson</code>: a named constructor</h3>
+        <p>Dart doesn't allow two constructors with the same name, so the second one gets a name after the dot.</p>
+      </div>
+    </div>
+
+    <h3>أمثلة تبيّن قوة <bdi dir="ltr">factory</bdi> <span lang="en" dir="ltr">· What a factory can do</span></h3>
+    <pre dir="ltr"><code>// (a) Run logic BEFORE creating — validation
+factory Task.fromJson(Map&lt;String, dynamic&gt; json) {
+  final name = (json["taskName"] as String?)?.trim() ?? "";
+  if (name.isEmpty) throw FormatException("Task without a name!");
+  return Task(taskName: name, ...);
+}
+
+// (b) Return the SAME object every time — singleton
+class AppSettings {
+  static final AppSettings _instance = AppSettings._internal();
+  AppSettings._internal();                 // private real constructor
+  factory AppSettings() =&gt; _instance;      // always the same object
+}
+identical(AppSettings(), AppSettings());   // true</code></pre>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>المثال (ب) <b>مستحيل</b> بمُنشئ عادي، لأن العادي يصنع كائنًا جديدًا في كل مرة.</p>
+        <p><b>هل يجب أن تكون <bdi dir="ltr">fromJson</bdi> من نوع <bdi dir="ltr">factory</bdi>؟</b> لا. كان يمكن كتابتها مُنشئًا عاديًا مع <bdi dir="ltr">initializer list</bdi>:</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>Example (b) is <b>impossible</b> with a normal constructor — it always makes a new object.</p>
+        <p><b>Must <code>fromJson</code> be a factory?</b> No. A normal named constructor with an initializer list also works:</p>
+      </div>
+    </div>
+    <pre dir="ltr"><code>Task.fromJson(Map&lt;String, dynamic&gt; json)
+    : taskName = json["taskName"],
+      taskDescription = json["taskDescription"],
+      isHighPriority = json["isHighPriority"],
+      isDone = json["isDone"] ?? false;</code></pre>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>لكن المبرمجين يفضّلون <bdi dir="ltr">factory</bdi> لـ <bdi dir="ltr">fromJson</bdi> لثلاثة أسباب: <b>المرونة</b> (يمكن إضافة تحقق أو <bdi dir="ltr">if</bdi> لاحقًا)، و<b>الوضوح</b> (جسم عادي مع <bdi dir="ltr">return</bdi>)، و<b>العُرف</b> (هكذا يكتبها مجتمع <bdi dir="ltr">Flutter</bdi>).</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>People still prefer <code>factory</code> for <code>fromJson</code>: <b>flexibility</b> (add checks later), <b>clarity</b> (a normal body with <code>return</code>), and <b>convention</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.6 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">⑥</bdi> السطر <bdi dir="ltr">?? false</bdi> <span lang="en" dir="ltr">· The <code>?? false</code> line</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>العامل <bdi dir="ltr">??</bdi> يعني: «إن كانت القيمة على اليسار <bdi dir="ltr">null</bdi>، فاستخدم القيمة على اليمين».</p>
+        <p><b>لماذا هنا؟</b> المهام القديمة حُفظت قبل أن تضيف الحقل <bdi dir="ltr">isDone</bdi>، فلا يوجد فيها هذا المفتاح أصلًا. بدون <bdi dir="ltr">??</bdi> تصبح القيمة <bdi dir="ltr">null</bdi>، والنوع <bdi dir="ltr">bool</bdi> لا يقبل <bdi dir="ltr">null</bdi>، فيتوقف التطبيق.</p>
+        <p>هذا السطر يجعل الكود <b>متوافقًا مع البيانات القديمة</b> <bdi dir="ltr">(backward compatible)</bdi>.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p><code>??</code> means "if the left side is <code>null</code>, use the right side".</p>
+        <p><b>Why here?</b> Tasks saved before <code>isDone</code> existed don't have that key. Without <code>??</code> you'd pass <code>null</code> into a <code>bool</code> → crash.</p>
+        <p>This line keeps old data working with new code: <b>backward compatible</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="here shared">
+    <p><b>الخلاصة — مبادئ <bdi dir="ltr">OOP</bdi> في هذا الكلاس:</b> <b>التغليف</b> <bdi dir="ltr">(Encapsulation)</bdi>: البيانات وطرق تحويلها في مكان واحد، والكلاس هو الذي «يعرف» كيف يحوّل نفسه. <b>عدم القابلية للتغيير</b> <bdi dir="ltr">(Immutability)</bdi>: <bdi dir="ltr">final</bdi> على ما لا يتغير. <b>مسؤولية واحدة</b>: الكلاس يمثّل مهمة فقط.</p>
+    <p lang="en" dir="ltr"><b>OOP takeaways:</b> encapsulation (data + its conversions together), immutability (<code>final</code>), single responsibility (it only represents a task).</p>
   </div>
 </section>
 
@@ -271,7 +493,222 @@ LOAD:  disk ──getString("tasks")──▶ String ──jsonDecode──▶ L
 
 <!-- 6 -->
 <section id="state">
-  <h2><bdi dir="ltr">6.</bdi> الحالة وإعادة الرسم <span lang="en" dir="ltr">· State and rebuilding</span></h2>
+  <h2><bdi dir="ltr">6.</bdi> <bdi dir="ltr">StatelessWidget</bdi> و <bdi dir="ltr">StatefulWidget</bdi> <span lang="en" dir="ltr">· Widgets and state</span></h2>
+
+  <!-- 6.1 -->
+  <div class="sub">
+    <h3>ما معنى الحالة <bdi dir="ltr">(State)</bdi>؟ <span lang="en" dir="ltr">· What is state?</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>الحالة هي أي بيانات <b>قد تتغير والشاشة معروضة</b>، فتحتاج الشاشة أن تتحدث عندما تتغير. أمثلة من مشروعك:</p>
+        <ul>
+          <li>مربع الاختيار للمهمة (<bdi dir="ltr">isDone</bdi>) ← حالة.</li>
+          <li>التبويب المختار في <bdi dir="ltr">BottomNavigationBar</bdi> (<bdi dir="ltr">_currentIndex</bdi>) ← حالة.</li>
+          <li>مفتاح الأولوية <bdi dir="ltr">Switch</bdi> في شاشة الإضافة ← حالة.</li>
+          <li>عنوان ثابت مثل <bdi dir="ltr">"My Tasks"</bdi> ← <b>ليس</b> حالة.</li>
+        </ul>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>State is any data that <b>can change while the screen is showing</b>, so the screen must redraw. From your project:</p>
+        <ul>
+          <li>A task's checkbox (<code>isDone</code>) → state.</li>
+          <li>The selected tab (<code>_currentIndex</code>) → state.</li>
+          <li>The priority <code>Switch</code> → state.</li>
+          <li>A fixed title like "My Tasks" → <b>not</b> state.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tbl-wrap shared">
+    <table>
+      <thead><tr><th></th><th><bdi dir="ltr">StatelessWidget</bdi></th><th><bdi dir="ltr">StatefulWidget</bdi></th></tr></thead>
+      <tbody>
+        <tr><td>يغيّر شكله بنفسه؟ <span lang="en" dir="ltr">/ Redraws itself?</span></td><td>❌ يُرسم بالبيانات التي وصلته</td><td>✅ يعيد رسم نفسه</td></tr>
+        <tr><td>يوجد <bdi dir="ltr">setState</bdi>؟</td><td>❌</td><td>✅</td></tr>
+        <tr><td>عدد الكلاسات <span lang="en" dir="ltr">/ Classes</span></td><td>كلاس واحد</td><td><b>اثنان</b>: الـ <bdi dir="ltr">Widget</bdi> والـ <bdi dir="ltr">State</bdi></td></tr>
+        <tr><td>في مشروعك <span lang="en" dir="ltr">/ In your project</span></td><td><bdi dir="ltr">TasksListWidget</bdi></td><td><bdi dir="ltr">MainScreen</bdi>، <bdi dir="ltr">TodoTasks</bdi>، <bdi dir="ltr">AddTask</bdi></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="tip">
+      <p><b>تشبيه 📺:</b> <bdi dir="ltr">Stateless</bdi> مثل <b>صورة مطبوعة</b>: لتغييرها تطبع صورة جديدة (أي يرسل الأب بيانات جديدة). <bdi dir="ltr">Stateful</bdi> مثل <b>شاشة تلفزيون</b>: الجهاز ثابت، لكن ما يُعرض عليه يتغير.</p>
+      <p lang="en" dir="ltr"><b>Analogy:</b> Stateless = a printed photo (reprint to change it). Stateful = a TV (same device, changing picture).</p>
+    </div>
+  </div>
+
+  <!-- 6.2 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">StatelessWidget</bdi>: الكود الجاهز سطرًا سطرًا <span lang="en" dir="ltr">· The boilerplate, line by line</span></h3>
+    <pre dir="ltr"><code>class TaskTitle extends StatelessWidget {          // 1
+  const TaskTitle({super.key, required this.title}); // 2
+
+  final String title;                               // 3
+
+  @override                                         // 4
+  Widget build(BuildContext context) {              // 5
+    return Text(title);
+  }
+}</code></pre>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <ol>
+          <li><bdi dir="ltr">extends</bdi> تعني <b>الوراثة</b> <bdi dir="ltr">(Inheritance)</bdi>: كلاسك يرث كل شيء من <bdi dir="ltr">StatelessWidget</bdi>، فيعرف <bdi dir="ltr">Flutter</bdi> أنه <bdi dir="ltr">widget</bdi>.</li>
+          <li>المُنشئ:
+            <ul>
+              <li><bdi dir="ltr">const</bdi>: يمكن صنع الكائن مرة واحدة وقت الترجمة، فلا يعيد <bdi dir="ltr">Flutter</bdi> بناءه بلا داعٍ. أداء أفضل. وشرطه أن تكون كل الحقول <bdi dir="ltr">final</bdi>.</li>
+              <li><bdi dir="ltr">super.key</bdi>: الـ <bdi dir="ltr">key</bdi> مثل بطاقة هوية للـ <bdi dir="ltr">widget</bdi> (مهم في القوائم). و <bdi dir="ltr">super</bdi> تعني «أرسله إلى الكلاس الأب»، لأن الأب هو من يملك هذا الحقل.</li>
+            </ul>
+          </li>
+          <li>البيانات القادمة من الخارج. <b>يجب</b> أن تكون <bdi dir="ltr">final</bdi>، لأن الـ <bdi dir="ltr">widget</bdi> في <bdi dir="ltr">Flutter</bdi> لا يتغير بعد صنعه. للتغيير يصنع <bdi dir="ltr">Flutter</bdi> <bdi dir="ltr">widget</bdi> جديدًا.</li>
+          <li><bdi dir="ltr">@override</bdi>: «أكتب نسختي الخاصة من دالة موجودة في الأب». ويتأكد المترجم أنك كتبت الاسم صحيحًا.</li>
+          <li><bdi dir="ltr">build</bdi> <b>أهم دالة في <bdi dir="ltr">Flutter</bdi></b>: تعيد <b>شكل</b> الـ <bdi dir="ltr">widget</bdi>. و <bdi dir="ltr">BuildContext context</bdi> هو <b>مكان</b> هذا الـ <bdi dir="ltr">widget</bdi> في الشجرة، ومنه تصل إلى ما فوقه، مثل <bdi dir="ltr">Theme.of(context)</bdi> و <bdi dir="ltr">Navigator.of(context)</bdi>.</li>
+        </ol>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <ol>
+          <li><code>extends</code> = <b>inheritance</b>: you inherit everything from <code>StatelessWidget</code>.</li>
+          <li>Constructor: <code>const</code> lets Flutter skip needless rebuilds (all fields must be <code>final</code>). <code>super.key</code> passes the widget's ID card up to the parent class, which owns that field.</li>
+          <li>Data from outside — must be <code>final</code>: widgets are immutable; to change, Flutter makes a new one.</li>
+          <li><code>@override</code>: "my own version of a parent method"; the compiler checks the name.</li>
+          <li><code>build</code> returns what the widget <b>looks like</b>. <code>context</code> is its <b>position in the tree</b>, used for <code>Theme.of</code>, <code>Navigator.of</code>, …</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6.3 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">StatefulWidget</bdi>: من ملفك <bdi dir="ltr">main_screen.dart</bdi> <span lang="en" dir="ltr">· From your own main_screen.dart</span></h3>
+    <pre dir="ltr"><code>class MainScreen extends StatefulWidget {          // A: the widget
+  const MainScreen({super.key});
+
+  @override
+  State&lt;MainScreen&gt; createState() =&gt; _MainScreenState();   // B: the link
+}
+
+class _MainScreenState extends State&lt;MainScreen&gt; { // C: the state
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (int? index) {
+          setState(() {                             // D: redraw!
+            _currentIndex = index ?? 0;
+          });
+        },
+        ...
+      ),
+      body: Screens[_currentIndex],
+    );
+  }
+}</code></pre>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <h3>لماذا كلاسان؟ 🤔</h3>
+        <p>هذا أكثر سؤال يربك المبتدئين:</p>
+        <ul>
+          <li><b>(A) <bdi dir="ltr">MainScreen</bdi></b> هو الـ <bdi dir="ltr">widget</bdi>، وهو <b>لا يتغير</b> مثل أي <bdi dir="ltr">widget</bdi>. <bdi dir="ltr">Flutter</bdi> يرميه ويصنع غيره كثيرًا.</li>
+          <li><b>(C) <bdi dir="ltr">_MainScreenState</bdi></b> هو الذي <b>يحمل البيانات المتغيرة</b>، وهو <b>يبقى حيًّا</b> حتى لو صُنع الـ <bdi dir="ltr">widget</bdi> من جديد.</li>
+        </ul>
+        <p><b>تشبيه:</b> الـ <bdi dir="ltr">widget</bdi> مثل <b>بطاقتك الشخصية</b>، قد تُطبع منها نسخ جديدة كثيرة. والـ <bdi dir="ltr">State</bdi> هو <b>أنت</b>: تبقى الشخص نفسه وذكرياتك معك مهما طُبعت البطاقة.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <h3>Why two classes?</h3>
+        <ul>
+          <li><b>(A)</b> the widget is <b>immutable</b>; Flutter throws it away and recreates it often.</li>
+          <li><b>(C)</b> the State <b>holds the changing data</b> and <b>survives</b> those recreations.</li>
+        </ul>
+        <p><b>Analogy:</b> the widget is your ID card (reprinted many times); the State is <b>you</b> — same person, same memories.</p>
+      </div>
+    </div>
+    <div class="pair shared">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <ul>
+          <li><b>(B) <bdi dir="ltr">createState()</bdi></b>: الوصلة بين الكلاسين. يستدعيها <bdi dir="ltr">Flutter</bdi> <b>مرة واحدة</b> عند ظهور الـ <bdi dir="ltr">widget</bdi> أول مرة، ليصنع كائن الـ <bdi dir="ltr">State</bdi> ويحتفظ به.</li>
+          <li><b>الشرطة <bdi dir="ltr">_</bdi></b> في <bdi dir="ltr">_MainScreenState</bdi> تعني <b>خاص</b> <bdi dir="ltr">(private)</bdi>: لا يُرى خارج الملف. لا أحد يحتاج أن يعرف الـ <bdi dir="ltr">State</bdi>، يكفيه <bdi dir="ltr">MainScreen</bdi>. هذا <b>تغليف</b>.</li>
+          <li><b><bdi dir="ltr">State&lt;MainScreen&gt;</bdi></b>: الأقواس <bdi dir="ltr">&lt; &gt;</bdi> اسمها <bdi dir="ltr">Generics</bdi>، ومعناها «هذا الـ <bdi dir="ltr">State</bdi> تابع لـ <bdi dir="ltr">MainScreen</bdi> تحديدًا». لذلك داخل الـ <bdi dir="ltr">State</bdi> تكتب <bdi dir="ltr">widget.something</bdi> لتصل إلى بيانات الـ <bdi dir="ltr">widget</bdi>.</li>
+          <li><b>(D) <bdi dir="ltr">setState</bdi> ⭐</b>: قلب الموضوع. تقول لـ <bdi dir="ltr">Flutter</bdi>: «غيّرت بيانات، أعد تشغيل <bdi dir="ltr">build</bdi> لتتحدث الشاشة».</li>
+        </ul>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <ul>
+          <li><b>(B) <code>createState()</code></b>: the link. Flutter calls it <b>once</b> when the widget first appears, then keeps that State.</li>
+          <li><b><code>_</code></b> = <b>private</b> to the file. Nobody outside needs the State — encapsulation.</li>
+          <li><b><code>State&lt;MainScreen&gt;</code></b>: generics — "this State belongs to <code>MainScreen</code>". Inside it, <code>widget.x</code> reaches the widget's data.</li>
+          <li><b>(D) <code>setState</code></b>: "data changed — re-run <code>build</code>".</li>
+        </ul>
+      </div>
+    </div>
+    <pre dir="ltr"><code>_currentIndex = 2;                       // ✗ data changed, screen doesn't know
+
+setState(() { _currentIndex = 2; });     // ✓ data changed AND screen redraws</code></pre>
+    <div class="bug">
+      <div class="pair">
+        <div class="ar">
+          <b>ملاحظة على ملفك</b>
+          <p>في <bdi dir="ltr">main_screen.dart</bdi> السطر <bdi dir="ltr">22</bdi>، المتغير <bdi dir="ltr">_currentIndex</bdi> (وكذلك <bdi dir="ltr">Screens</bdi>) معرَّف <b>خارج</b> الكلاس <bdi dir="ltr">_MainScreenState</bdi>، فهو متغير عام. الكود يعمل الآن، لكن مكان الحالة الصحيح هو <b>داخل كلاس الـ <bdi dir="ltr">State</bdi></b>. مثلًا: إذا خرج المستخدم من <bdi dir="ltr">MainScreen</bdi> ثم عاد إليها، يبقى التبويب القديم مختارًا بدل أن يبدأ من <bdi dir="ltr">0</bdi>.</p>
+        </div>
+        <div class="en" lang="en" dir="ltr">
+          <b>Note on your file</b>
+          <p><code>main_screen.dart</code> line 22: <code>_currentIndex</code> (and <code>Screens</code>) live <b>outside</b> <code>_MainScreenState</code> as globals. It works, but state belongs <b>inside the State class</b> — otherwise leaving and re-entering <code>MainScreen</code> keeps the old tab instead of starting at 0.</p>
+        </div>
+      </div>
+      <pre dir="ltr"><code>class _MainScreenState extends State&lt;MainScreen&gt; {
+  int _currentIndex = 0;     // ✓ state lives here
+  ...
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 6.4 -->
+  <div class="sub">
+    <h3>دورة الحياة <span lang="en" dir="ltr">· Lifecycle</span></h3>
+    <pre dir="ltr" class="flow"><code>createState() ──▶ initState() ──▶ build() ◀──▶ setState() re-runs build()
+                                       │
+                                       ▼
+                                   dispose()   ← widget removed from screen</code></pre>
+    <pre dir="ltr"><code>@override
+void initState() {
+  super.initState();      // call the parent FIRST
+  _loadTasks();
+}
+
+@override
+void dispose() {
+  _controller.dispose();
+  super.dispose();        // call the parent LAST
+}</code></pre>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <ul>
+          <li><bdi dir="ltr">initState()</bdi>: مرة واحدة في البداية. مكان تحميل البيانات.</li>
+          <li><bdi dir="ltr">dispose()</bdi>: مرة واحدة في النهاية. مكان التنظيف، مثل إغلاق <bdi dir="ltr">TextEditingController</bdi>.</li>
+        </ul>
+        <p><b>كيف تختار؟</b> اسأل: «هل يحتاج هذا الـ <bdi dir="ltr">widget</bdi> أن يغيّر شكله بنفسه بعد رسمه؟» لا ← <bdi dir="ltr">Stateless</bdi> (ابدأ به دائمًا، فهو أبسط). نعم ← <bdi dir="ltr">Stateful</bdi>.</p>
+        <p>💡 في <bdi dir="ltr">VS Code</bdi> اكتب <bdi dir="ltr">stless</bdi> أو <bdi dir="ltr">stful</bdi> واضغط <bdi dir="ltr">Enter</bdi> ليُكتب الكود الجاهز. ويمكن التحويل بينهما بـ <bdi dir="ltr">Ctrl + .</bdi> على اسم الكلاس.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <ul>
+          <li><code>initState()</code>: once at the start — load data here.</li>
+          <li><code>dispose()</code>: once at the end — clean up (e.g. controllers).</li>
+        </ul>
+        <p><b>Which one?</b> "Does this widget need to change itself after it's drawn?" No → Stateless (start here). Yes → Stateful.</p>
+        <p>Tip: type <code>stless</code> / <code>stful</code> in VS Code; convert with <code>Ctrl + .</code> on the class name.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub">النمط في شاشات القوائم <span lang="en" dir="ltr">· The pattern in your list screens</span></h3>
   <div class="pair">
     <div class="ar">
       <span class="lang">العربية</span>
@@ -301,32 +738,266 @@ LOAD:  disk ──getString("tasks")──▶ String ──jsonDecode──▶ L
 <!-- 7 -->
 <section id="forms">
   <h2><bdi dir="ltr">7.</bdi> النماذج والتحقق من الإدخال <span lang="en" dir="ltr">· Forms and validation</span></h2>
-  <pre dir="ltr"><code>final GlobalKey&lt;FormState&gt; _key = GlobalKey&lt;FormState&gt;();
+  <p>هذا الكود من ملفك <bdi dir="ltr">lib/screens/add_task.dart</bdi> بعد حذف التنسيقات <bdi dir="ltr">(style / decoration)</bdi> لنرى الفكرة فقط. <span lang="en" dir="ltr">(Your real code, styling removed.)</span></p>
+  <pre dir="ltr"><code>final TextEditingController taskNameController = TextEditingController();  // ①
+final GlobalKey&lt;FormState&gt; _key = GlobalKey&lt;FormState&gt;();                 // ②
 
-Form(key: _key, child: ... TextFormField(
-  controller: taskNameController,
-  validator: (value) =&gt; value!.trim().isEmpty ? "Task name is required" : null,
-))
+Form(                                                    // ③
+  key: _key,
+  child: Column(children: [
+    TextFormField(                                       // ④
+      controller: taskNameController,
+      validator: (value) =&gt;                              // ⑤
+          value!.trim().isEmpty ? "Task name is required" : null,
+    ),
+    TextFormField(
+      controller: taskDescController,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return "Task description is required";
+        }
+      },
+    ),
+    ...
+    OutlinedButton.icon(
+      onPressed: () async {
+        if (_key.currentState?.validate() ?? false) {    // ⑥
+          final task = Task(taskName: taskNameController.text, ...);  // ⑦
+          ... save ...
+          taskNameController.clear();
+        }
+      },
+    ),
+  ]),
+)</code></pre>
 
-if (_key.currentState?.validate() ?? false) { /* save */ }</code></pre>
-  <div class="pair">
-    <div class="ar">
-      <span class="lang">العربية</span>
-      <ul>
-        <li><bdi dir="ltr">TextEditingController</bdi>: يتيح لنا قراءة النص المكتوب (<bdi dir="ltr">.text</bdi>) ومسحه (<bdi dir="ltr">.clear()</bdi>).</li>
-        <li><bdi dir="ltr">validator</bdi>: يعيد رسالة خطأ إذا كان الإدخال غير صالح، ويعيد <bdi dir="ltr">null</bdi> إذا كان صالحًا.</li>
-        <li><bdi dir="ltr">GlobalKey&lt;FormState&gt;</bdi>: مفتاح يربطنا بالنموذج، فنستطيع استدعاء <bdi dir="ltr">validate()</bdi> على كل الحقول مرة واحدة.</li>
-        <li><bdi dir="ltr">Switch</bdi>: لاختيار الأولوية العالية، ويُحدَّث بواسطة <bdi dir="ltr">setState</bdi>.</li>
-      </ul>
+  <div class="tip">
+    <p><b>الصورة الكبيرة:</b> <bdi dir="ltr">Form</bdi> مثل <b>مدرّس</b>، وكل <bdi dir="ltr">TextFormField</bdi> <b>طالب</b>، وكل <bdi dir="ltr">validator</bdi> هو <b>قاعدة التصحيح</b> لورقة هذا الطالب. و <bdi dir="ltr">_key</bdi> هو <b>رقم هاتف المدرّس</b>: من خلاله تتصل به وتقول: «صحّح كل الأوراق الآن» (<bdi dir="ltr">validate()</bdi>)، فيردّ عليك: «الكل ناجح» (<bdi dir="ltr">true</bdi>) أو «يوجد راسب» (<bdi dir="ltr">false</bdi>)، ويكتب الخطأ تحت كل ورقة راسبة.</p>
+    <p lang="en" dir="ltr"><b>Big picture:</b> <code>Form</code> is a teacher, each <code>TextFormField</code> a student, each <code>validator</code> the grading rule. <code>_key</code> is the teacher's phone number: you call and say "grade everything" (<code>validate()</code>); the answer is all passed (<code>true</code>) or someone failed (<code>false</code>), with errors written under each failing field.</p>
+  </div>
+
+  <!-- 7.1 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">①</bdi> <bdi dir="ltr">TextEditingController</bdi> <span lang="en" dir="ltr">· Reading what the user typed</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>كائن «يمسك» الحقل من الخارج. من خلاله:</p>
+        <ul>
+          <li><bdi dir="ltr">taskNameController.text</bdi>: تقرأ النص المكتوب (نستخدمه في <bdi dir="ltr">⑦</bdi> لصنع الـ <bdi dir="ltr">Task</bdi>).</li>
+          <li><bdi dir="ltr">taskNameController.clear()</bdi>: تمسح الحقل بعد الحفظ.</li>
+        </ul>
+        <p>نربطه بالحقل بواسطة <bdi dir="ltr">controller: taskNameController</bdi>. لكل حقل <bdi dir="ltr">controller</bdi> خاص به، لذلك عندك اثنان: للاسم وللوصف.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>An object that "holds" the field from outside:</p>
+        <ul>
+          <li><code>.text</code> reads the typed text (used in ⑦).</li>
+          <li><code>.clear()</code> empties the field after saving.</li>
+        </ul>
+        <p>Linked with <code>controller:</code>. One controller per field — you have two.</p>
+      </div>
     </div>
-    <div class="en" lang="en" dir="ltr">
-      <span class="lang">English</span>
-      <ul>
-        <li><code>TextEditingController</code>: read the typed text (<code>.text</code>) and clear it (<code>.clear()</code>).</li>
-        <li><code>validator</code>: return an error message if invalid, <code>null</code> if valid.</li>
-        <li><code>GlobalKey&lt;FormState&gt;</code>: a handle to the form so you can call <code>validate()</code> on all fields at once.</li>
-        <li><code>Switch</code>: high-priority toggle, updated with <code>setState</code>.</li>
-      </ul>
+  </div>
+
+  <!-- 7.2 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">②</bdi> <bdi dir="ltr">GlobalKey&lt;FormState&gt;</bdi> <span lang="en" dir="ltr">· A handle to the form</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>تذكّر من القسم <bdi dir="ltr">6</bdi>: كل <bdi dir="ltr">StatefulWidget</bdi> له كلاس <bdi dir="ltr">State</bdi>. و <bdi dir="ltr">Form</bdi> نفسه <bdi dir="ltr">StatefulWidget</bdi>، والـ <bdi dir="ltr">State</bdi> الخاص به اسمه <bdi dir="ltr">FormState</bdi>. هو الذي يملك الدالة <bdi dir="ltr">validate()</bdi>.</p>
+        <p>المشكلة: الـ <bdi dir="ltr">State</bdi> مخفي داخل <bdi dir="ltr">Flutter</bdi>، فكيف نصل إليه من زر الإضافة؟ الحل هو <bdi dir="ltr">GlobalKey</bdi>: نعطيه للـ <bdi dir="ltr">Form</bdi> (<bdi dir="ltr">key: _key</bdi>)، ثم نسأله لاحقًا: <bdi dir="ltr">_key.currentState</bdi> ← «أعطني الـ <bdi dir="ltr">FormState</bdi> الموجود الآن».</p>
+        <p>و <bdi dir="ltr">&lt;FormState&gt;</bdi> (<bdi dir="ltr">Generics</bdi>) تخبر <bdi dir="ltr">Dart</bdi> أن <bdi dir="ltr">currentState</bdi> سيكون من نوع <bdi dir="ltr">FormState</bdi>، فيظهر لك <bdi dir="ltr">validate()</bdi> في الإكمال التلقائي.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>Recall section 6: every StatefulWidget has a State. <code>Form</code> is a StatefulWidget whose State is <code>FormState</code> — the owner of <code>validate()</code>.</p>
+        <p>That State is hidden inside Flutter. A <code>GlobalKey</code> is how you reach it: give it to the form (<code>key: _key</code>), later ask <code>_key.currentState</code> → "the FormState that exists right now".</p>
+        <p><code>&lt;FormState&gt;</code> tells Dart the type, so autocomplete knows about <code>validate()</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7.3 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">③ ④</bdi> <bdi dir="ltr">Form</bdi> و <bdi dir="ltr">TextFormField</bdi> <span lang="en" dir="ltr">· The container and its fields</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <ul>
+          <li><b><bdi dir="ltr">Form</bdi></b> لا يرسم شيئًا على الشاشة. هو <b>غلاف</b> يجمع كل الحقول التي داخله، مهما كانت عميقة (هنا داخل <bdi dir="ltr">Column</bdi> ثم <bdi dir="ltr">SingleChildScrollView</bdi> ثم <bdi dir="ltr">Column</bdi>).</li>
+          <li><b><bdi dir="ltr">TextFormField</bdi></b> هو <bdi dir="ltr">TextField</bdi> عادي + قدرة على التحقق. عندما يكون داخل <bdi dir="ltr">Form</bdi> <b>يسجّل نفسه</b> فيه تلقائيًا.</li>
+        </ul>
+        <p><b>الفرق:</b> <bdi dir="ltr">TextField</bdi> العادي ليس له <bdi dir="ltr">validator</bdi> ولا يعرف شيئًا عن <bdi dir="ltr">Form</bdi>. لذلك نستخدم <bdi dir="ltr">TextFormField</bdi> عندما نريد التحقق.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <ul>
+          <li><b><code>Form</code></b> draws nothing. It's a <b>wrapper</b> that groups every field inside it, however deep.</li>
+          <li><b><code>TextFormField</code></b> = a <code>TextField</code> + validation. Inside a <code>Form</code>, it <b>registers itself</b> automatically.</li>
+        </ul>
+        <p>A plain <code>TextField</code> has no <code>validator</code> and doesn't know about <code>Form</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7.4 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">⑤</bdi> <bdi dir="ltr">validator</bdi> <span lang="en" dir="ltr">· The grading rule</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>دالة تستقبل النص المكتوب <bdi dir="ltr">value</bdi> وتعيد واحدًا من شيئين:</p>
+        <ul>
+          <li><b>نص</b> ← يوجد خطأ، و<bdi dir="ltr">Flutter</bdi> يعرض هذا النص بالأحمر تحت الحقل.</li>
+          <li><b><bdi dir="ltr">null</bdi></b> ← الإدخال صحيح، لا يوجد خطأ.</li>
+        </ul>
+        <p>لذلك نوعها <bdi dir="ltr">String?</bdi>. انتبه: <bdi dir="ltr">null</bdi> هنا تعني «نجح»، وليس «فشل».</p>
+        <p><b>لماذا <bdi dir="ltr">.trim()</bdi>؟</b> تحذف المسافات من البداية والنهاية. بدونها يستطيع المستخدم كتابة مسافات فقط <bdi dir="ltr">"   "</bdi> فيُقبل الاسم.</p>
+        <p><b>في ملفك كتبت الـ <bdi dir="ltr">validator</bdi> بطريقتين:</b></p>
+        <ul>
+          <li>للاسم: سطر واحد بـ <bdi dir="ltr">=&gt;</bdi> و <bdi dir="ltr">? :</bdi>.</li>
+          <li>للوصف: جسم كامل مع <bdi dir="ltr">if</bdi>. عندما ينجح لا يوجد <bdi dir="ltr">return</bdi>، فتعيد <bdi dir="ltr">Dart</bdi> <bdi dir="ltr">null</bdi> تلقائيًا. هذا يعمل، لكن الأوضح أن تكتب <bdi dir="ltr">return null;</bdi> في النهاية، وسيختفي التحذير من المحرر.</li>
+        </ul>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>A function that takes the typed <code>value</code> and returns either:</p>
+        <ul>
+          <li>a <b>String</b> → error; Flutter shows it in red under the field.</li>
+          <li><b><code>null</code></b> → valid.</li>
+        </ul>
+        <p>So its type is <code>String?</code>. Careful: here <code>null</code> means "passed".</p>
+        <p><b><code>.trim()</code></b> removes leading/trailing spaces, so <code>"   "</code> doesn't count as a name.</p>
+        <p><b>Your file uses two styles:</b> a one-line <code>=&gt;</code> with <code>? :</code> for the name, and a block with <code>if</code> for the description. The block has no <code>return</code> on success, so Dart returns <code>null</code> implicitly — it works, but add <code>return null;</code> to be explicit and silence the editor warning.</p>
+      </div>
+    </div>
+    <pre dir="ltr"><code>validator: (value) {
+  if (value == null || value.trim().isEmpty) {
+    return "Task description is required";
+  }
+  return null;   // ✓ explicit: "no error"
+},</code></pre>
+  </div>
+
+  <!-- 7.5 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">⑥</bdi> السطر <bdi dir="ltr">if (_key.currentState?.validate() ?? false)</bdi> <span lang="en" dir="ltr">· The validation line, piece by piece</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <p>هذا السطر يبدو معقدًا، لكنه أربع خطوات صغيرة. نقرؤه من اليسار إلى اليمين:</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <p>It looks scary, but it's four small steps, read left to right:</p>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>الجزء</th><th>معناه</th><th>النوع الناتج</th><th lang="en" dir="ltr">Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><bdi dir="ltr">_key</bdi></td><td>المفتاح الذي أعطيناه للـ <bdi dir="ltr">Form</bdi></td><td><bdi dir="ltr">GlobalKey&lt;FormState&gt;</bdi></td><td lang="en" dir="ltr">The key we gave the Form</td></tr>
+        <tr><td><bdi dir="ltr">.currentState</bdi></td><td>الـ <bdi dir="ltr">FormState</bdi> الموجود الآن. قد يكون <bdi dir="ltr">null</bdi> إذا لم يكن الـ <bdi dir="ltr">Form</bdi> على الشاشة</td><td><bdi dir="ltr">FormState?</bdi></td><td lang="en" dir="ltr">The live FormState — <code>null</code> if the Form isn't on screen</td></tr>
+        <tr><td><bdi dir="ltr">?.validate()</bdi></td><td>إن لم يكن <bdi dir="ltr">null</bdi>، شغّل <bdi dir="ltr">validate()</bdi>. وإن كان <bdi dir="ltr">null</bdi>، توقّف وأعطِ <bdi dir="ltr">null</bdi> بدل أن يتوقف التطبيق</td><td><bdi dir="ltr">bool?</bdi></td><td lang="en" dir="ltr">If not null, call <code>validate()</code>; if null, give <code>null</code> instead of crashing</td></tr>
+        <tr><td><bdi dir="ltr">?? false</bdi></td><td>إن كانت النتيجة <bdi dir="ltr">null</bdi>، اعتبرها <bdi dir="ltr">false</bdi></td><td><bdi dir="ltr">bool</bdi></td><td lang="en" dir="ltr">Turn <code>null</code> into <code>false</code></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="pair shared">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <h3>ماذا تفعل <bdi dir="ltr">validate()</bdi> بالضبط؟</h3>
+        <ol>
+          <li>تمرّ على <b>كل</b> <bdi dir="ltr">TextFormField</bdi> داخل الـ <bdi dir="ltr">Form</bdi>.</li>
+          <li>تشغّل الـ <bdi dir="ltr">validator</bdi> الخاص بكل حقل.</li>
+          <li>تعرض رسالة الخطأ تحت كل حقل فاشل.</li>
+          <li>تعيد <bdi dir="ltr">true</bdi> إذا نجحت كل الحقول، و <bdi dir="ltr">false</bdi> إذا فشل حقل واحد على الأقل.</li>
+        </ol>
+        <h3>لماذا نحتاج <bdi dir="ltr">?? false</bdi>؟</h3>
+        <p>الشرط <bdi dir="ltr">if</bdi> في <bdi dir="ltr">Dart</bdi> يقبل <bdi dir="ltr">bool</bdi> فقط، ولا يقبل <bdi dir="ltr">bool?</bdi>. لأن <bdi dir="ltr">?.</bdi> قد تعطي <bdi dir="ltr">null</bdi>، نحتاج <bdi dir="ltr">??</bdi> لنحوّلها إلى <bdi dir="ltr">bool</bdi> مؤكد. واخترنا <bdi dir="ltr">false</bdi> لأن الآمن هو: «إن لم أتأكد أن النموذج صحيح، فلا أحفظ».</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <h3>What does <code>validate()</code> do?</h3>
+        <ol>
+          <li>Visits <b>every</b> <code>TextFormField</code> in the Form.</li>
+          <li>Runs each field's <code>validator</code>.</li>
+          <li>Shows the error text under each failing field.</li>
+          <li>Returns <code>true</code> if all passed, <code>false</code> if any failed.</li>
+        </ol>
+        <h3>Why <code>?? false</code>?</h3>
+        <p>Dart's <code>if</code> accepts <code>bool</code>, not <code>bool?</code>. Since <code>?.</code> can produce <code>null</code>, <code>??</code> turns it into a definite <code>bool</code>. <code>false</code> is the safe choice: "not sure it's valid → don't save".</p>
+      </div>
+    </div>
+    <pre dir="ltr"><code>// The same line, written the long way:
+final FormState? form = _key.currentState;
+bool isValid;
+if (form == null) {
+  isValid = false;           // no form on screen → treat as invalid
+} else {
+  isValid = form.validate(); // run every validator
+}
+if (isValid) { /* create Task and save */ }
+
+// Another way you'll see often (uses ! = "I promise it's not null"):
+if (_key.currentState!.validate()) { ... }   // crashes if currentState is null</code></pre>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <h3>مثال: ماذا يحدث عند الضغط على <bdi dir="ltr">Add Task</bdi>؟</h3>
+        <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>الاسم</th><th>الوصف</th><th><bdi dir="ltr">validate()</bdi></th><th>النتيجة</th></tr></thead>
+          <tbody>
+            <tr><td>فارغ</td><td>فارغ</td><td><bdi dir="ltr">false</bdi></td><td>رسالتا خطأ، لا حفظ</td></tr>
+            <tr><td><bdi dir="ltr">"Study"</bdi></td><td>فارغ</td><td><bdi dir="ltr">false</bdi></td><td>خطأ تحت الوصف فقط، لا حفظ</td></tr>
+            <tr><td><bdi dir="ltr">"   "</bdi></td><td><bdi dir="ltr">"Ch. 3"</bdi></td><td><bdi dir="ltr">false</bdi></td><td>خطأ تحت الاسم (بسبب <bdi dir="ltr">trim</bdi>)</td></tr>
+            <tr><td><bdi dir="ltr">"Study"</bdi></td><td><bdi dir="ltr">"Ch. 3"</bdi></td><td><bdi dir="ltr">true</bdi></td><td>تُصنع المهمة وتُحفظ ⑦</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <h3>Example: tapping Add Task</h3>
+        <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th><th><code>validate()</code></th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>empty</td><td>empty</td><td><code>false</code></td><td>two errors, no save</td></tr>
+            <tr><td><code>"Study"</code></td><td>empty</td><td><code>false</code></td><td>error under description only</td></tr>
+            <tr><td><code>"   "</code></td><td><code>"Ch. 3"</code></td><td><code>false</code></td><td>error under name (trim)</td></tr>
+            <tr><td><code>"Study"</code></td><td><code>"Ch. 3"</code></td><td><code>true</code></td><td>task created and saved ⑦</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7.6 -->
+  <div class="sub">
+    <h3><bdi dir="ltr">⑦</bdi> بعد النجاح، و <bdi dir="ltr">Switch</bdi> <span lang="en" dir="ltr">· After validation, and the Switch</span></h3>
+    <div class="pair">
+      <div class="ar">
+        <span class="lang">العربية</span>
+        <ul>
+          <li>نصنع <bdi dir="ltr">Task</bdi> من <bdi dir="ltr">controller.text</bdi>، ثم نحفظه بالطريقة الموضحة في القسم <bdi dir="ltr">5</bdi>، ثم نمسح الحقول بـ <bdi dir="ltr">clear()</bdi>.</li>
+          <li><bdi dir="ltr">Switch</bdi> ليس داخل التحقق، فلا يحتاج <bdi dir="ltr">validator</bdi>. قيمته في المتغير <bdi dir="ltr">isHighPriority</bdi>، ونغيّرها داخل <bdi dir="ltr">setState</bdi> ليتحرك المفتاح على الشاشة.</li>
+        </ul>
+        <p>⚠️ تذكير: كما في <bdi dir="ltr">MainScreen</bdi>، المتغيرات <bdi dir="ltr">taskNameController</bdi> و <bdi dir="ltr">_key</bdi> و <bdi dir="ltr">isHighPriority</bdi> معرّفة <b>خارج</b> <bdi dir="ltr">_AddTaskState</bdi> (الأسطر <bdi dir="ltr">16–19</bdi>). مكانها الصحيح داخله، مع <bdi dir="ltr">dispose()</bdi> للـ <bdi dir="ltr">controllers</bdi>. انظر القسم <bdi dir="ltr">10</bdi>.</p>
+      </div>
+      <div class="en" lang="en" dir="ltr">
+        <span class="lang">English</span>
+        <ul>
+          <li>Build a <code>Task</code> from <code>controller.text</code>, save it as in section 5, then <code>clear()</code> the fields.</li>
+          <li>The <code>Switch</code> isn't validated. Its value lives in <code>isHighPriority</code>, changed inside <code>setState</code> so it animates.</li>
+        </ul>
+        <p>Reminder: like <code>MainScreen</code>, the controllers, <code>_key</code> and <code>isHighPriority</code> are globals (lines 16–19). They belong inside <code>_AddTaskState</code>, with <code>dispose()</code> for the controllers. See section 10.</p>
+      </div>
     </div>
   </div>
 </section>
