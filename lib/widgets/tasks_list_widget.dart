@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/models/task.dart';
 
 class TasksListWidget extends StatelessWidget {
-  TasksListWidget({super.key, required this.task, required this.onTaskChanged});
+  const TasksListWidget({super.key, required this.task, required this.onTaskChanged});
   final List<Task> task;
   final Function(bool?,int?) onTaskChanged;
   @override
